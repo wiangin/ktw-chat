@@ -12,6 +12,7 @@
   "dependencies": {
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
+    "@fontsource/roboto": "^5.2.5",
     "@mui/material": "^7.0.2",
     "emoji-picker-react": "^4.12.2",
     "firebase": "^11.6.1",

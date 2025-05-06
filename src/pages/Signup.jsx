@@ -1,14 +1,24 @@
-import { Box, Button, TextField } from "@mui/material";
+import {
+  Box,
+  Button,
+  Container,
+  TextField,
+  Typography,
+  Dialog,
+} from "@mui/material";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import useUserAuth from "../customHook/useUserAuth";
 
+const buttonBgColor = "#9c27b0";
+
 const SighUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [checkAuth, setCheckAuth] = useState(true);
   const navigate = useNavigate();
   const { user } = useUserAuth();
 
@@ -34,72 +44,90 @@ const SighUp = () => {
       navigate("/chatroom");
     } catch (error) {
       console.log("Error signing up with Email: ", error);
+      setCheckAuth(false);
+
     }
   };
 
-  // console.log("User : ", user);
-
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        height: "100vh",
-      }}
-    >
-      <h1>Sign Up</h1>
-      <Box>
-        <form onSubmit={handleSignUp}>
-          <Box>
-            <TextField
-              label={"Email"}
-              variant={"standard"}
-              type="text"
-              id="username"
-              name="username"
-              required
-              value={email}
-              onChange={handleEmailChange}
-            />
-          </Box>
-          <Box>
-            <TextField
-            label={"Password"}
-            variant={"standard"}
-              type="password"
-              id="password"
-              name="password"
-              required
-              value={password}
-              onChange={handlePasswordChange}
-            />
-          </Box>
-          <Box>
-            <TextField
-            label={"Confirm password"}
-            variant={"standard"}
-              type="password"
-              id="password"
-              name="password"
-              required
-              value={confirmPassword}
-              onChange={handleConfirmPassword}
-            />
-          </Box>
-          <Box display={"flex"} justifyContent={"center"} marginTop={2}>
-            <Button variant={"contained"} type="submit">Sign Up</Button>
-          </Box>
-        </form>
+    <Container maxWidth={"xl"}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          height: "100vh",
+        }}
+      >
+        <Typography variant={"h1"} fontSize={50}>
+          Sign Up
+        </Typography>
+        <Box>
+          <form onSubmit={handleSignUp}>
+            <Box>
+              <TextField
+                label={"Email"}
+                variant={"standard"}
+                type={"text"}
+                id={"username"}
+                name={"username"}
+                required
+                value={email}
+                onChange={handleEmailChange}
+                color={"secondary"}
+              />
+            </Box>
+            <Box marginTop={1}>
+              <TextField
+                label={"Password"}
+                variant={"standard"}
+                type={"password"}
+                id={"password"}
+                name={"password"}
+                required
+                value={password}
+                onChange={handlePasswordChange}
+                color={"secondary"}
+              />
+            </Box>
+            <Box marginTop={1}>
+              <TextField
+                label={"Confirm password"}
+                variant={"standard"}
+                type={"password"}
+                id={"password"}
+                name={"password"}
+                required
+                value={confirmPassword}
+                onChange={handleConfirmPassword}
+                color={"secondary"}
+              />
+            </Box>
+            <Box display={"flex"} justifyContent={"center"} marginTop={3}>
+              <Button
+                variant={"contained"}
+                type="submit"
+                sx={{ bgcolor: buttonBgColor }}
+              >
+                Sign Up
+              </Button>
+            </Box>
+          </form>
+        </Box>
+        <Box marginTop={3}>
+          <Box component={"span"}>Already have an account ? </Box>
+          <Link to={"/"}>Log in</Link>
+        </Box>
+        {!checkAuth && (
+          <Dialog open={!checkAuth} onClose={() => setCheckAuth(true)}>
+            <Box display={"flex"} justifyContent={"center"} margin={6}>
+              <p>Password may not match !!!</p>
+            </Box>
+          </Dialog>
+        )}
       </Box>
-      <Box marginTop={2}>
-        <Box component={"span"}>Already have an account ? </Box>
-        <Link to={"/"}>Log in</Link>
-      </Box>
-
-      
-    </Box>
+    </Container>
   );
 };
 

@@ -1,17 +1,20 @@
+import React, { useEffect, useState } from "react";
+import { auth } from "../firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import useUserAuth from "../customHook/useUserAuth";
+import { useNavigate, Navigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
+import MessageInput from "./MessageInput";
 
-import React, { useEffect, useState } from 'react';
-import { auth } from '../firebase';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import  useUserAuth  from '../customHook/useUserAuth';
-import { useNavigate, Navigate } from 'react-router-dom';
+const ChatRoom = ({ user }) => {
+  return (
+    <>
+      <Navbar />
+      Välkommen till chattrum
+      {/*Här kommer vara en container som  visar meddelande */}
+      <MessageInput/>
+    </>
+  )
+}
 
-const ChatRoom = () => {
-   
-    return (
-        <div>
-           Välkommen till chattrum
-        </div>
-    )
-};
-
-export default ChatRoom
+export default ChatRoom;

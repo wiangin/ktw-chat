@@ -11,14 +11,14 @@ const appId = import.meta.env.VITE_APP_ID;
 const measurementId = import.meta.env.VITE_MEASUREMENT_ID;
 
 const firebaseConfig = {
-    apiKey: apiKey,
-    authDomain: authDomain,
-    projectId: projectId,
-    storageBucket: storageBucket,
-    messagingSenderId: messagingSenderId,
-    appId: appId,
-    measurementId: measurementId, 
-}
+  apiKey: apiKey,
+  authDomain: authDomain,
+  projectId: projectId,
+  storageBucket: storageBucket,
+  messagingSenderId: messagingSenderId,
+  appId: appId,
+  measurementId: measurementId,
+};
 
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);

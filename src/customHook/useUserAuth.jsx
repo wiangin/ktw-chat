@@ -3,15 +3,15 @@ import { useState, useEffect } from "react";
 import { auth } from "../firebase";
 
 const useUserAuth = () => {
-    const [user, setUser] = useState(null);
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user)
-        });
-        return unsubscribe;
-    }, []);
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+    return unsubscribe;
+  }, []);
 
-    return { user };
+  return { user };
 };
 
 export default useUserAuth;
