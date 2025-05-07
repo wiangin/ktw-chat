@@ -4,7 +4,7 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import SighUp from "./pages/Signup";
 import { Container } from "@mui/material";
-import ChatRoom from "./components/ChatRoom";
+import ChatRoom from "./pages/ChatRoom";
 import useUserAuth from "./customHook/useUserAuth";
 
 function App() {

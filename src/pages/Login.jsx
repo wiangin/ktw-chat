@@ -10,6 +10,7 @@ import {
   Dialog,
   Typography,
   Container,
+  FormControl
 } from "@mui/material";
 import "@fontsource/roboto/400.css";
 
@@ -76,7 +77,7 @@ const Login = () => {
           KtW CHAT
         </Typography>
         <Box marginTop={4}>
-          <form onSubmit={handleLoginWithEmail}>
+          <FormControl component={"form"} onSubmit={handleLoginWithEmail}>
             <Box>
               <TextField
                 label={"Email"}
@@ -113,7 +114,7 @@ const Login = () => {
                 Log in
               </Button>
             </Box>
-          </form>
+          </FormControl>
 
           <Box marginTop={3} display={"flex"} gap={1}>
             <Box component={"span"}>Dont have an account ?</Box>
@@ -133,7 +134,7 @@ const Login = () => {
         {!checkAuth && (
           <Dialog open={!checkAuth} onClose={() => setCheckAuth(true)}>
             <Box display={"flex"} justifyContent={"center"} margin={6}>
-              <p>Wrong email or password !!!</p>
+              <Typography variant={"h6"}>Wrong email or password !!!</Typography>
             </Box>
           </Dialog>
         )}
