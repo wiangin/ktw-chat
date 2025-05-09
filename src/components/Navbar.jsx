@@ -19,62 +19,67 @@ import { useState } from "react";
 const buttonBgColor = "#9c27b0";
 
 const Navbar = () => {
-    const { user } = useUserAuth();
-    const navigate = useNavigate();
-    const [username, setUsername] = useState();
-    const [anchorElUser, setAnchorElUser] = useState(null);
+  const { user } = useUserAuth();
+  const navigate = useNavigate();
+  const [username, setUsername] = useState();
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
-    const handleSignOut = async () => {
-        await signOut(auth)
-        navigate("/")
-    };
+  const handleSignOut = async () => {
+    await signOut(auth);
+    navigate("/");
+  };
 
-    const handleOpenUserMenu = (e) => {
-        setAnchorElUser(e.currentTarget)
-    };
+  const handleOpenUserMenu = (e) => {
+    setAnchorElUser(e.currentTarget);
+  };
 
-    const handleCloseUserMenu = () => {
-        setAnchorElUser(null)
-    }
-    
-    return (
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  return (
     <AppBar position={"sticky"}>
-      
-        <Toolbar
-          disableGutters
-          sx={{ justifyContent: "space-between", height: 60, bgcolor: buttonBgColor, padding: "15px"}}
-        >
-          <Typography variant={"h6"}>KtW CHAT</Typography>
+      <Toolbar
+        disableGutters
+        sx={{
+          justifyContent: "space-between",
+          height: 60,
+          bgcolor: buttonBgColor,
+          padding: "15px",
+        }}
+      >
+        <Typography variant={"h6"}>KtW CHAT</Typography>
         <Box>
-            <Tooltip title={ user ? user.email : "User" }>
-            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0}}>
-                <Avatar />
+          <Tooltip title={user ? user.email : "User"}>
+            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+              <Avatar />
             </IconButton>
-            
           </Tooltip>
           <Menu
-            sx={{mt: "45px"}}
+            sx={{ mt: "45px" }}
             id={"menu-appbar"}
-              anchorEl={anchorElUser}
-              anchorOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorElUser)}
-              onClose={handleCloseUserMenu}
+            anchorEl={anchorElUser}
+            anchorOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+            open={Boolean(anchorElUser)}
+            onClose={handleCloseUserMenu}
           >
-            <MenuItem onClick={handleSignOut}>
-                <Typography textAlign={"center"}>Log Out</Typography>
+            <MenuItem
+              onClick={handleSignOut}
+              sx={{ "&:hover": { backgroundColor: "lightGrey" } }}
+            >
+              <Typography textAlign={"center"}>Log Out</Typography>
             </MenuItem>
           </Menu>
         </Box>
-         
-        </Toolbar>
+      </Toolbar>
     </AppBar>
   );
 };

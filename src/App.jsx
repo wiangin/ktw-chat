@@ -11,9 +11,15 @@ function App() {
   const { user } = useUserAuth();
   return (
     <Routes>
-      <Route path="/" element={ !user ? <Login /> : <Navigate to={"/chatroom"}/> } />
+      <Route
+        path="/"
+        element={!user ? <Login /> : <Navigate to={"/chatroom"} />}
+      />
       <Route path="/signup" element={<SighUp />} />
-      <Route path="/chatroom" element={ user ? <ChatRoom user={user}/> : <Navigate to={"/"}/> } />
+      <Route
+        path="/chatroom"
+        element={user ? <ChatRoom user={user} /> : <Navigate to={"/"} />}
+      />
     </Routes>
   );
 }
