@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
-import { auth, provider } from "../firebase";
+import { useState } from "react";
+import { auth, provider, db} from "../firebase";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
-import useUserAuth from "../customHook/useUserAuth";
 import { useNavigate, Link } from "react-router-dom";
 import {
   Box,
@@ -10,17 +9,16 @@ import {
   Dialog,
   Typography,
   Container,
-  FormControl
+  FormControl,
 } from "@mui/material";
 import "@fontsource/roboto/400.css";
-
-const buttonBgColor = "#9c27b0";
+import colors from "../colors";
+import { setDoc, doc} from "firebase/firestore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [checkAuth, setCheckAuth] = useState(true);
-  const { user } = useUserAuth();
   const navigate = useNavigate();
 
   const handleEmailChange = (event) => {
@@ -36,15 +34,19 @@ const Login = () => {
       await signInWithEmailAndPassword(auth, email, password);
       console.log("sign in success!!!");
       navigate("/chatroom");
+
+      await setDoc(doc(db, "users", auth.currentUser.uid),{
+        email: auth.currentUser.email,
+        user_id: auth.currentUser.uid
+      },
+      {merge: true})
+
       setEmail("");
       setPassword("");
     } catch (error) {
       console.log("Error signing in with email: ", error);
       setEmail("");
       setPassword("");
-      //   if (user === null) {
-      //     setCheckAuth(false);
-      //   }
       setCheckAuth(false);
     }
   };
@@ -54,6 +56,13 @@ const Login = () => {
       await signInWithPopup(auth, provider);
       console.log("sign in success!!!");
       navigate("/chatroom");
+
+      await setDoc(doc(db, "users", auth.currentUser.uid),{
+        email: auth.currentUser.email,
+        user_id: auth.currentUser.uid
+      },
+      {merge: true})
+
     } catch (error) {
       console.log("Error signing in with Google: ", error);
     }
@@ -69,15 +78,14 @@ const Login = () => {
           alignItems: "center",
           justifyContent: "center",
           height: "100vh",
-          // bgcolor: "#121212",
-          // color: "#F5F5DC"
         }}
       >
         <Typography variant={"h1"} fontSize={50}>
           KtW CHAT
         </Typography>
+
         <Box marginTop={4}>
-          <FormControl component={"form"} onSubmit={handleLoginWithEmail}>
+          <FormControl component={"form"} onSubmit={handleLoginWithEmail} >
             <Box>
               <TextField
                 label={"Email"}
@@ -105,11 +113,12 @@ const Login = () => {
                 color="secondary"
               />
             </Box>
+
             <Box display={"flex"} justifyContent={"center"} marginTop={3}>
               <Button
                 variant={"contained"}
                 type={"submit"}
-                sx={{ bgcolor: buttonBgColor}}
+                sx={{ bgcolor: colors.bgViolet }}
               >
                 Log in
               </Button>
@@ -125,22 +134,25 @@ const Login = () => {
             <Button
               variant={"contained"}
               onClick={handleLoginWithGoogle}
-              sx={{ bgcolor: buttonBgColor }}
+              sx={{ bgcolor: colors.bgViolet }}
             >
               Sign in with Google
             </Button>
           </Box>
         </Box>
+
         {!checkAuth && (
           <Dialog open={!checkAuth} onClose={() => setCheckAuth(true)}>
             <Box display={"flex"} justifyContent={"center"} margin={6}>
-              <Typography variant={"h6"}>Wrong email or password !!!</Typography>
+              <Typography variant={"h6"}>
+                Wrong email or password !!!
+              </Typography>
             </Box>
           </Dialog>
         )}
       </Box>
     </Container>
-  )
-}
+  );
+};
 
 export default Login;

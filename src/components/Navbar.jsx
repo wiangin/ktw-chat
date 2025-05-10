@@ -11,21 +11,26 @@ import {
   MenuItem,
 } from "@mui/material";
 import { signOut } from "firebase/auth";
-import { auth } from "../firebase";
+import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import useUserAuth from "../customHook/useUserAuth";
 import { useState } from "react";
+import colors from "../colors";
+import { deleteDoc, doc } from "firebase/firestore";
 
-const buttonBgColor = "#9c27b0";
-
-const Navbar = () => {
+const Navbar = ({ isUser }) => {
   const { user } = useUserAuth();
   const navigate = useNavigate();
-  const [username, setUsername] = useState();
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleSignOut = async () => {
-    await signOut(auth);
+    const userRef = doc(db, "users", isUser);
+    try {
+      await deleteDoc(userRef);
+      await signOut(auth);
+    } catch (error) {
+      console.log("Error signing out");
+    }
     navigate("/");
   };
 
@@ -44,7 +49,7 @@ const Navbar = () => {
         sx={{
           justifyContent: "space-between",
           height: 60,
-          bgcolor: buttonBgColor,
+          bgcolor: colors.bgViolet,
           padding: "15px",
         }}
       >

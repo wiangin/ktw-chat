@@ -5,14 +5,14 @@ import {
   TextField,
   Typography,
   Dialog,
+  FormControl,
 } from "@mui/material";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
 import useUserAuth from "../customHook/useUserAuth";
-
-const buttonBgColor = "#9c27b0";
+import colors from "../colors";
 
 const SighUp = () => {
   const [email, setEmail] = useState("");
@@ -20,7 +20,6 @@ const SighUp = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [checkAuth, setCheckAuth] = useState(true);
   const navigate = useNavigate();
-  const { user } = useUserAuth();
 
   const handleEmailChange = (e) => {
     setEmail(e.target.value);
@@ -36,7 +35,6 @@ const SighUp = () => {
 
     if (password !== confirmPassword) {
       console.log("Password not match!!!");
-      // Lägg alert att password inte matcha!
       setConfirmPassword("");
     }
     try {
@@ -45,10 +43,11 @@ const SighUp = () => {
     } catch (error) {
       console.log("Error signing up with Email: ", error);
       setCheckAuth(false);
-
     }
   };
 
+  console.log(checkAuth);
+  
   return (
     <Container maxWidth={"xl"}>
       <Box
@@ -63,8 +62,9 @@ const SighUp = () => {
         <Typography variant={"h1"} fontSize={50}>
           Sign Up
         </Typography>
+
         <Box>
-          <form onSubmit={handleSignUp}>
+          <FormControl component={"form"} onSubmit={handleSignUp}>
             <Box>
               <TextField
                 label={"Email"}
@@ -78,6 +78,7 @@ const SighUp = () => {
                 color={"secondary"}
               />
             </Box>
+
             <Box marginTop={1}>
               <TextField
                 label={"Password"}
@@ -91,6 +92,7 @@ const SighUp = () => {
                 color={"secondary"}
               />
             </Box>
+
             <Box marginTop={1}>
               <TextField
                 label={"Confirm password"}
@@ -104,25 +106,28 @@ const SighUp = () => {
                 color={"secondary"}
               />
             </Box>
+
             <Box display={"flex"} justifyContent={"center"} marginTop={3}>
               <Button
                 variant={"contained"}
                 type="submit"
-                sx={{ bgcolor: buttonBgColor }}
+                sx={{ bgcolor: colors.bgViolet }}
               >
                 Sign Up
               </Button>
             </Box>
-          </form>
+          </FormControl>
         </Box>
+
         <Box marginTop={3}>
           <Box component={"span"}>Already have an account ? </Box>
           <Link to={"/"}>Log in</Link>
         </Box>
+
         {!checkAuth && (
           <Dialog open={!checkAuth} onClose={() => setCheckAuth(true)}>
             <Box display={"flex"} justifyContent={"center"} margin={6}>
-              <p>Password may not match !!!</p>
+              <Typography variant={"body2"}>Password may not match !!!</Typography>
             </Box>
           </Dialog>
         )}

@@ -19,22 +19,21 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
   const open = Boolean(anchorEl);
   const handleDeleteMessage = async () => {
     try {
-      const messageToDelete = doc(db, "messages", message.id);
-      await deleteDoc(messageToDelete);
+      const messageRef = doc(db, "messages", message.id);
+      await deleteDoc(messageRef);
     } catch (error) {
       console.log("Error deleting message: ", error);
     }
   };
 
   const handleClick = (e) => {
-    console.log("delete");
     setAnchorEl(e.currentTarget);
   };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
-
+    
   return (
     <Box sx={{ margin: "10px" }}>
       {isOwnMessage ? (

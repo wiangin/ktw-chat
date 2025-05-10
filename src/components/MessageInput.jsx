@@ -14,8 +14,9 @@ import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
+import colors from "../colors";
 
-const buttonBgColor = "#9c27b0";
+
 const MessageInput = ({ user }) => {
   const [newMessage, setNewMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
@@ -67,7 +68,7 @@ const MessageInput = ({ user }) => {
 
         <Button
           variant={"contained"}
-          sx={{ bgcolor: buttonBgColor }}
+          sx={{ bgcolor: colors.bgViolet }}
           type={"submit"}
         >
           Send
