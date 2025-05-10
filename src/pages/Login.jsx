@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth, provider, db} from "../firebase";
+import { auth, provider, db } from "../firebase";
 import { signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 import { useNavigate, Link } from "react-router-dom";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@mui/material";
 import "@fontsource/roboto/400.css";
 import colors from "../colors";
-import { setDoc, doc} from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -35,11 +35,14 @@ const Login = () => {
       console.log("sign in success!!!");
       navigate("/chatroom");
 
-      await setDoc(doc(db, "users", auth.currentUser.uid),{
-        email: auth.currentUser.email,
-        user_id: auth.currentUser.uid
-      },
-      {merge: true})
+      await setDoc(
+        doc(db, "users", auth.currentUser.uid),
+        {
+          email: auth.currentUser.email,
+          user_id: auth.currentUser.uid,
+        },
+        { merge: true }
+      );
 
       setEmail("");
       setPassword("");
@@ -57,12 +60,14 @@ const Login = () => {
       console.log("sign in success!!!");
       navigate("/chatroom");
 
-      await setDoc(doc(db, "users", auth.currentUser.uid),{
-        email: auth.currentUser.email,
-        user_id: auth.currentUser.uid
-      },
-      {merge: true})
-
+      await setDoc(
+        doc(db, "users", auth.currentUser.uid),
+        {
+          email: auth.currentUser.email,
+          user_id: auth.currentUser.uid,
+        },
+        { merge: true }
+      );
     } catch (error) {
       console.log("Error signing in with Google: ", error);
     }
@@ -85,7 +90,7 @@ const Login = () => {
         </Typography>
 
         <Box marginTop={4}>
-          <FormControl component={"form"} onSubmit={handleLoginWithEmail} >
+          <FormControl component={"form"} onSubmit={handleLoginWithEmail}>
             <Box>
               <TextField
                 label={"Email"}

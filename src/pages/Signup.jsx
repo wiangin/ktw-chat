@@ -47,7 +47,7 @@ const SighUp = () => {
   };
 
   console.log(checkAuth);
-  
+
   return (
     <Container maxWidth={"xl"}>
       <Box
@@ -127,7 +127,9 @@ const SighUp = () => {
         {!checkAuth && (
           <Dialog open={!checkAuth} onClose={() => setCheckAuth(true)}>
             <Box display={"flex"} justifyContent={"center"} margin={6}>
-              <Typography variant={"body2"}>Password may not match !!!</Typography>
+              <Typography variant={"body2"}>
+                Password may not match !!!
+              </Typography>
             </Box>
           </Dialog>
         )}

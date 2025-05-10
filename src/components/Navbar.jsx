@@ -18,13 +18,13 @@ import { useState } from "react";
 import colors from "../colors";
 import { deleteDoc, doc } from "firebase/firestore";
 
-const Navbar = ({ isUser }) => {
+const Navbar = () => {
   const { user } = useUserAuth();
   const navigate = useNavigate();
   const [anchorElUser, setAnchorElUser] = useState(null);
 
   const handleSignOut = async () => {
-    const userRef = doc(db, "users", isUser);
+    const userRef = doc(db, "users", user.uid);
     try {
       await deleteDoc(userRef);
       await signOut(auth);

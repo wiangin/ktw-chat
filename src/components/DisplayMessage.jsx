@@ -33,7 +33,7 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-    
+
   return (
     <Box sx={{ margin: "10px" }}>
       {isOwnMessage ? (

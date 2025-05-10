@@ -12,9 +12,16 @@ import {
   useTheme,
   Tooltip,
 } from "@mui/material";
-import { collection, onSnapshot, orderBy, query, where, getDocs, doc } from "firebase/firestore";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+  getDocs,
+  doc,
+} from "firebase/firestore";
 import DisplayMessage from "../components/DisplayMessage";
-
 
 const ChatRoom = ({ user }) => {
   const [messages, setMessages] = useState([]);
@@ -22,8 +29,7 @@ const ChatRoom = ({ user }) => {
   const theme = useTheme();
   const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
-  const [ loggedInUser, setLoggedInUsers ] = useState([]);
-
+  const [loggedInUser, setLoggedInUsers] = useState([]);
 
   useEffect(() => {
     const queryDb = query(collection(db, "messages"), orderBy("createdAt"));
@@ -39,34 +45,37 @@ const ChatRoom = ({ user }) => {
     return unsubscribe;
   }, []);
 
-   useEffect( () => {
+  useEffect(() => {
     const queryDb = query(collection(db, "users"));
-      const unsubscribe = onSnapshot(queryDb, (onSnapshot) => {
+    const unsubscribe = onSnapshot(queryDb, (onSnapshot) => {
       const inloggedUser = onSnapshot.docs.map((user) => ({
         id: user.id,
         ...user.data(),
       }));
       setLoggedInUsers(inloggedUser);
-    }); 
+    });
     return unsubscribe;
+  }, []);
 
-  }, [])
-  
   return (
     <>
-      <Navbar isUser={ user.uid }/>
-      <Box sx={{display: "flex", flexDirection: isTablet ? "row" : "column"}}>
+      <Navbar />
+      <Box sx={{ display: "flex", flexDirection: isTablet ? "row" : "column" }}>
         <Container>
-          <Box sx={{display: "flex", flexDirection: isMobile ? "row" : "column", margin: "20px"}}>
-            {
-            loggedInUser.filter((u) => u.user_id !== user.uid)
-            .map((n) => (
-              <Tooltip title={n.email} key={n.user_id}>
-                <Avatar/>
-              </Tooltip>
-          ))
-            
-          }
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: isMobile ? "row" : "column",
+              margin: "20px",
+            }}
+          >
+            {loggedInUser
+              .filter((u) => u.user_id !== user.uid)
+              .map((u) => (
+                <Tooltip title={u.email} key={u.user_id}>
+                  <Avatar />
+                </Tooltip>
+              ))}
           </Box>
         </Container>
         <Container component={"section"} maxWidth={"sm"}>
@@ -75,7 +84,7 @@ const ChatRoom = ({ user }) => {
             sx={{
               overflowY: "scroll",
               padding: "10px",
-              marginBottom: "10px"
+              marginBottom: "10px",
             }}
           >
             {messages.map((msg) => (
