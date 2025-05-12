@@ -1,6 +1,6 @@
 
 const colors = {
-    bgViolet: "#9c27b0"
+    bgViolet: "#7b1fa2"
 }
 
 export default colors;

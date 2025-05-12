@@ -10,9 +10,9 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth } from "../firebase";
-import useUserAuth from "../customHook/useUserAuth";
+import { auth, db } from "../firebase";
 import colors from "../colors";
+import { setDoc, doc } from "firebase/firestore";
 
 const SighUp = () => {
   const [email, setEmail] = useState("");
@@ -40,6 +40,14 @@ const SighUp = () => {
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       navigate("/chatroom");
+      await setDoc(
+        doc(db, "users", auth.currentUser.uid),
+        {
+          email: auth.currentUser.email,
+          user_id: auth.currentUser.uid,
+        },
+        { merge: true }
+      );
     } catch (error) {
       console.log("Error signing up with Email: ", error);
       setCheckAuth(false);

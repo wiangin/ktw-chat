@@ -11,6 +11,8 @@ import {
   useMediaQuery,
   useTheme,
   Tooltip,
+  Chip,
+  Grid,
 } from "@mui/material";
 import {
   collection,
@@ -58,49 +60,83 @@ const ChatRoom = ({ user }) => {
   }, []);
 
   return (
-    <>
-      <Navbar />
-      <Box sx={{ display: "flex", flexDirection: isTablet ? "row" : "column" }}>
-        <Container>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: isMobile ? "row" : "column",
-              margin: "20px",
-            }}
-          >
-            {loggedInUser
-              .filter((u) => u.user_id !== user.uid)
-              .map((u) => (
-                <Tooltip title={u.email} key={u.user_id}>
-                  <Avatar />
-                </Tooltip>
-              ))}
-          </Box>
-        </Container>
-        <Container component={"section"} maxWidth={"sm"}>
-          <Paper
-            elevation={3}
-            sx={{
-              overflowY: "scroll",
-              padding: "10px",
-              marginBottom: "10px",
-            }}
-          >
-            {messages.map((msg) => (
-              <DisplayMessage
-                key={msg.id}
-                message={msg}
-                isOwnMessage={user.uid === msg.user_id}
-              />
-            ))}
-            <Box ref={dummy} />
-          </Paper>
-        </Container>
+    <Container
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        justifyContent: "space-between",
+        height: "100vh",
+        width: "100vw"
+      }}
+      disableGutters
+      maxWidth={"xl"}
+    >
+      <Box>
+        <Navbar />
+        <Grid container paddingX={isTablet && 6}>
+          <Grid item size={isTablet ? 4 : 12}>
+            <Container sx={{ marginY: "25px" }}>
+              <Chip label={"Who's in the room"} sx={{ fontSize: "16px" }} />
+              <Box
+                padding={2}
+                display={"flex"}
+                flexDirection={isMobile ? "row" : "column"}
+                gap={1}
+              >
+                {isTablet &&
+                  loggedInUser
+                    .filter((u) => u.user_id !== user.uid)
+                    .map((u) => (
+                      <Box
+                        key={u.user_id}
+                        display={"flex"}
+                        alignItems={"center"}
+                        gap={1}
+                        marginBottom={1}
+                      >
+                        <Avatar />
+                        <Chip label={u.email} sx={{ fontSize: "16px" }}/>
+                      </Box>
+                    ))}
+
+                {isMobile &&
+                  loggedInUser
+                    .filter((u) => u.user_id !== user.uid)
+                    .map((u) => (
+                      <Tooltip title={u.email} key={u.user_id} arrow>
+                        <Avatar />
+                      </Tooltip>
+                    ))}
+              </Box>
+            </Container>
+          </Grid>
+
+          <Grid item size={isTablet ? 8 : 12}>
+            <Container sx={{ marginTop: isTablet && "25px" }}>
+              <Paper
+                elevation={3}
+                sx={{
+                  overflowY: "scroll",
+                  padding: "10px",
+                  marginBottom: "10px",
+                }}
+              >
+                {messages.map((msg) => (
+                  <DisplayMessage
+                    key={msg.id}
+                    message={msg}
+                    isOwnMessage={user.uid === msg.user_id}
+                  />
+                ))}
+                <Box ref={dummy} />
+              </Paper>
+            </Container>
+          </Grid>
+        </Grid>
       </Box>
 
       <MessageInput user={user} />
-    </>
+    </Container>
   );
 };
 

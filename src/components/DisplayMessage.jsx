@@ -8,11 +8,14 @@ import {
   Typography,
   Menu,
   MenuItem,
+  Chip
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { deleteDoc, doc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useState } from "react";
+import FaceIcon from '@mui/icons-material/Face';
+
 
 const DisplayMessage = ({ message, isOwnMessage }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -46,21 +49,8 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
             marginTop: "20px",
           }}
         >
-          <Paper
-            onClick={handleClick}
-            sx={{
-              padding: "10px",
-              marginTop: "5px",
-              display: "flex",
-              alignItems: "flex-end",
-              flexDirection: "column",
-              cursor: "pointer",
-            }}
-          >
-            <Typography variant={"body2"}>{message.text}</Typography>
-          </Paper>
-
-          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <Chip label={message.text} onClick={handleClick} sx={{fontSize: "16px"}} color={"secondary"}/>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose} sx={{marginTop: "8px"}}>
             <MenuItem
               sx={{
                 "&:hover": {
@@ -76,13 +66,17 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
           </Menu>
         </Box>
       ) : (
-        <Box marginTop={3} display={"flex"} alignItems={"center"} gap={"10px"}>
-          <Tooltip title={message.displayName}>
+        <Box marginTop={3} display={"flex"} flexDirection={"column"} alignItems={"start"} gap={"10px"}>
+          {/* <Tooltip title={message.displayName} arrow>
             <Avatar />
-          </Tooltip>
-          <Paper sx={{ padding: "10px", marginTop: "5px" }}>
-            <Typography variant={"body2"}>{message.text}</Typography>
-          </Paper>
+          </Tooltip> */}
+          <Box display={"flex"} alignItems={"center"} gap={1}>
+           
+            <Chip label={message.displayName} avatar={<FaceIcon/>} />
+          </Box>
+          
+          <Chip label={ message.text } sx={{fontSize: "16px"}}>
+          </Chip>
         </Box>
       )}
     </Box>
