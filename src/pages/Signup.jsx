@@ -10,9 +10,9 @@ import {
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { auth, db } from "../firebase";
+import { auth } from "../firebase";
 import colors from "../colors";
-import { setDoc, doc } from "firebase/firestore";
+import { setUserToDb } from "../utility/setUserToDb";
 
 const SighUp = () => {
   const [email, setEmail] = useState("");
@@ -34,27 +34,17 @@ const SighUp = () => {
     e.preventDefault();
 
     if (password !== confirmPassword) {
-      console.log("Password not match!!!");
       setConfirmPassword("");
     }
     try {
       await createUserWithEmailAndPassword(auth, email, password);
       navigate("/chatroom");
-      await setDoc(
-        doc(db, "users", auth.currentUser.uid),
-        {
-          email: auth.currentUser.email,
-          user_id: auth.currentUser.uid,
-        },
-        { merge: true }
-      );
+      setUserToDb();
     } catch (error) {
       console.log("Error signing up with Email: ", error);
       setCheckAuth(false);
     }
   };
-
-  console.log(checkAuth);
 
   return (
     <Container maxWidth={"xl"}>
@@ -120,6 +110,7 @@ const SighUp = () => {
                 variant={"contained"}
                 type="submit"
                 sx={{ bgcolor: colors.bgViolet }}
+                fullWidth
               >
                 Sign Up
               </Button>

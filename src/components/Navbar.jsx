@@ -1,10 +1,8 @@
 import {
   AppBar,
-  Container,
   Toolbar,
   Typography,
   Box,
-  Tooltip,
   Avatar,
   Menu,
   IconButton,
@@ -17,6 +15,7 @@ import useUserAuth from "../customHook/useUserAuth";
 import { useState } from "react";
 import colors from "../colors";
 import { deleteDoc, doc } from "firebase/firestore";
+import CustomTooltip from "../CustomComponent/CustomTooltip";
 
 const Navbar = () => {
   const { user } = useUserAuth();
@@ -55,11 +54,11 @@ const Navbar = () => {
       >
         <Typography variant={"h6"}>KtW CHAT</Typography>
         <Box>
-          <Tooltip title={user ? user.email : "User"}>
+          <CustomTooltip title={user ? user.email : "User"}>
             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
               <Avatar />
             </IconButton>
-          </Tooltip>
+          </CustomTooltip>
           <Menu
             sx={{ mt: "45px" }}
             id={"menu-appbar"}

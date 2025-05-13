@@ -1,15 +1,4 @@
-import {
-  Toolbar,
-  TextField,
-  Button,
-  Grid,
-  FormControl,
-  Box,
-  Popover,
-  Fab,
-  Tooltip,
-  Popper,
-} from "@mui/material";
+import { TextField, Button, FormControl, Popover } from "@mui/material";
 import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";

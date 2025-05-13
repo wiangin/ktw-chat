@@ -10,10 +10,12 @@ import {
   Typography,
   Container,
   FormControl,
+  styled,
 } from "@mui/material";
 import "@fontsource/roboto/400.css";
 import colors from "../colors";
-import { setDoc, doc } from "firebase/firestore";
+import { setUserToDb } from "../utility/setUserToDb";
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -32,18 +34,8 @@ const Login = () => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      console.log("sign in success!!!");
       navigate("/chatroom");
-
-      await setDoc(
-        doc(db, "users", auth.currentUser.uid),
-        {
-          email: auth.currentUser.email,
-          user_id: auth.currentUser.uid,
-        },
-        { merge: true }
-      );
-
+      setUserToDb();
       setEmail("");
       setPassword("");
     } catch (error) {
@@ -57,17 +49,8 @@ const Login = () => {
   const handleLoginWithGoogle = async () => {
     try {
       await signInWithPopup(auth, provider);
-      console.log("sign in success!!!");
       navigate("/chatroom");
-
-      await setDoc(
-        doc(db, "users", auth.currentUser.uid),
-        {
-          email: auth.currentUser.email,
-          user_id: auth.currentUser.uid,
-        },
-        { merge: true }
-      );
+      setUserToDb();
     } catch (error) {
       console.log("Error signing in with Google: ", error);
     }
@@ -89,7 +72,7 @@ const Login = () => {
           KtW CHAT
         </Typography>
 
-        <Box marginTop={4}>
+        <Box marginTop={4} textAlign={"center"}>
           <FormControl component={"form"} onSubmit={handleLoginWithEmail}>
             <Box>
               <TextField
@@ -102,6 +85,7 @@ const Login = () => {
                 value={email}
                 onChange={handleEmailChange}
                 color="secondary"
+                
               />
             </Box>
 
@@ -123,6 +107,7 @@ const Login = () => {
               <Button
                 variant={"contained"}
                 type={"submit"}
+                fullWidth
                 sx={{ bgcolor: colors.bgViolet }}
               >
                 Log in
@@ -130,9 +115,9 @@ const Login = () => {
             </Box>
           </FormControl>
 
-          <Box marginTop={3} display={"flex"} gap={1}>
-            <Box component={"span"}>Dont have an account ?</Box>
-            <Link to={"/signup"}>Sign up</Link>
+          <Box marginTop={1}>
+            <Box component={"span"}>Forget your password?</Box>{" "}
+            <Link to={"/resetpassword"}>Reset</Link>
           </Box>
 
           <Box display={"flex"} justifyContent={"center"} marginTop={3}>
@@ -140,9 +125,14 @@ const Login = () => {
               variant={"contained"}
               onClick={handleLoginWithGoogle}
               sx={{ bgcolor: colors.bgViolet }}
+              fullWidth
             >
               Sign in with Google
             </Button>
+          </Box>
+          <Box marginTop={3} display={"flex"} gap={1}>
+            <Box component={"span"}>Dont have an account?</Box>
+            <Link to={"/signup"}>Sign up</Link>
           </Box>
         </Box>
 

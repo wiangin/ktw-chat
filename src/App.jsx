@@ -6,6 +6,7 @@ import SighUp from "./pages/Signup";
 import { Container } from "@mui/material";
 import ChatRoom from "./pages/ChatRoom";
 import useUserAuth from "./customHook/useUserAuth";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
   const { user } = useUserAuth();
@@ -20,6 +21,7 @@ function App() {
         path="/chatroom"
         element={user ? <ChatRoom user={user} /> : <Navigate to={"/"} />}
       />
+      <Route path="/resetpassword" element={<ResetPassword/>}/>
     </Routes>
   );
 }

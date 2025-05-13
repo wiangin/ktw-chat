@@ -10,20 +10,12 @@ import {
   Paper,
   useMediaQuery,
   useTheme,
-  Tooltip,
   Chip,
   Grid,
 } from "@mui/material";
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-  where,
-  getDocs,
-  doc,
-} from "firebase/firestore";
+import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import DisplayMessage from "../components/DisplayMessage";
+import CustomTooltip from "../CustomComponent/CustomTooltip";
 
 const ChatRoom = ({ user }) => {
   const [messages, setMessages] = useState([]);
@@ -66,16 +58,15 @@ const ChatRoom = ({ user }) => {
         flexDirection: "column",
         justifyContent: "space-between",
         height: "100vh",
-        width: "100vw"
       }}
       disableGutters
       maxWidth={"xl"}
     >
       <Box>
         <Navbar />
-        <Grid container paddingX={isTablet && 6}>
+        <Grid container paddingX={2}>
           <Grid item size={isTablet ? 4 : 12}>
-            <Container sx={{ marginY: "25px" }}>
+            <Container sx={{ marginTop: "25px" }}>
               <Chip label={"Who's in the room"} sx={{ fontSize: "16px" }} />
               <Box
                 padding={2}
@@ -95,7 +86,7 @@ const ChatRoom = ({ user }) => {
                         marginBottom={1}
                       >
                         <Avatar />
-                        <Chip label={u.email} sx={{ fontSize: "16px" }}/>
+                        <Chip label={u.email} sx={{ fontSize: "16px" }} />
                       </Box>
                     ))}
 
@@ -103,16 +94,16 @@ const ChatRoom = ({ user }) => {
                   loggedInUser
                     .filter((u) => u.user_id !== user.uid)
                     .map((u) => (
-                      <Tooltip title={u.email} key={u.user_id} arrow>
+                      <CustomTooltip title={u.email} key={u.user_id} arrow>
                         <Avatar />
-                      </Tooltip>
+                      </CustomTooltip>
                     ))}
               </Box>
             </Container>
           </Grid>
 
           <Grid item size={isTablet ? 8 : 12}>
-            <Container sx={{ marginTop: isTablet && "25px" }}>
+            <Container sx={{ marginTop: "25px" }}>
               <Paper
                 elevation={3}
                 sx={{
