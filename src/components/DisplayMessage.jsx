@@ -5,6 +5,7 @@ import { db } from "../firebase";
 import { useState } from "react";
 import FaceIcon from "@mui/icons-material/Face";
 
+
 const DisplayMessage = ({ message, isOwnMessage }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);

@@ -3,7 +3,6 @@ import { db } from "../firebase";
 import Navbar from "../components/Navbar";
 import MessageInput from "../components/MessageInput";
 import {
-  Card,
   Box,
   Container,
   Avatar,
