@@ -21,7 +21,7 @@ import EmojiPicker from "emoji-picker-react";
 const DisplayMessage = ({ message, isOwnMessage }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
-  const [newMessage, setNewMessage] = useState("");
+  const [newMessage, setNewMessage] = useState(message.text);
   const [openTextEdit, setOpenTextEdit] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const sendButtonRef = useRef(null);
