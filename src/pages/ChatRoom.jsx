@@ -109,7 +109,10 @@ const ChatRoom = ({ user }) => {
                   overflowY: "scroll",
                   padding: "10px",
                   marginBottom: "10px",
+                  // Hur ska det se ut när det inte finns något meddelande?
                 }}
+                
+                
               >
                 {messages.map((msg) => (
                   <DisplayMessage

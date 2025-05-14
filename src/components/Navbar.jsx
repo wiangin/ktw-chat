@@ -77,9 +77,18 @@ const Navbar = () => {
           >
             <MenuItem
               onClick={handleSignOut}
-              sx={{ "&:hover": { backgroundColor: "lightGrey" } }}
+              sx={{ display: "flex", flexDirection: "column" }}
             >
-              <Typography textAlign={"center"}>Log Out</Typography>
+              <Box
+                textAlign={"center"}
+                sx={{
+                  "&:hover": { backgroundColor: "lightGrey" },
+                  width: "100%",
+                  padding: "5px",
+                }}
+              >
+                <Typography variant={"body2"}>Log Out</Typography>
+              </Box>
             </MenuItem>
           </Menu>
         </Box>

@@ -6,23 +6,24 @@ import { db } from "../firebase";
 import colors from "../colors";
 
 const MessageInput = ({ user }) => {
-  const [newMessage, setNewMessage] = useState("");
+  const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
 
   const handleOnchangeNewMessage = (e) => {
-    setNewMessage(e.target.value);
+    setMessage(e.target.value);
   };
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!newMessage.trim()) return;
+    if (!message.trim()) return;
     await addDoc(collection(db, "messages"), {
-      text: newMessage,
+      text: message,
       createdAt: serverTimestamp(),
       user_id: user.uid,
       displayName: user.email,
+      edit: false
     });
-    setNewMessage("");
+    setMessage("");
   };
 
   const handleEmojiPicker = () => {
@@ -45,7 +46,7 @@ const MessageInput = ({ user }) => {
       >
         <TextField
           type={"text"}
-          value={newMessage}
+          value={message}
           onChange={handleOnchangeNewMessage}
           placeholder={"Type a message ..."}
           size="small"
@@ -68,7 +69,7 @@ const MessageInput = ({ user }) => {
             onClose={() => setShowEmojiPicker(false)}
           >
             <EmojiPicker
-              onEmojiClick={(emoji) => setNewMessage(newMessage + emoji.emoji)}
+              onEmojiClick={(emoji) => setMessage(message + emoji.emoji)}
               height={500}
               width={300}
             />

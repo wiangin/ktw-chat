@@ -12,6 +12,7 @@ import colors from "../colors";
 import { auth } from "../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
 
+
 const ResetPassword = () => {
   const [email, setEmail] = useState("");
   const [sendNotice, setSendNotice] = useState(true);

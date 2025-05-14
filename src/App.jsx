@@ -16,12 +16,12 @@ function App() {
         path="/"
         element={!user ? <Login /> : <Navigate to={"/chatroom"} />}
       />
-      <Route path="/signup" element={<SighUp />} />
+      <Route path={"/signup"} element={<SighUp />} />
       <Route
-        path="/chatroom"
+        path={"/chatroom"}
         element={user ? <ChatRoom user={user} /> : <Navigate to={"/"} />}
       />
-      <Route path="/resetpassword" element={<ResetPassword/>}/>
+      <Route path={"/resetpassword" }element={<ResetPassword/>}/>
     </Routes>
   );
 }
