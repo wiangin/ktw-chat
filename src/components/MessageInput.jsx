@@ -21,7 +21,7 @@ const MessageInput = ({ user }) => {
       createdAt: serverTimestamp(),
       user_id: user.uid,
       displayName: user.email,
-      edit: false
+      edit: false,
     });
     setMessage("");
   };
@@ -38,10 +38,12 @@ const MessageInput = ({ user }) => {
         sx={{
           display: "flex",
           flexDirection: "row",
-          padding: "10px",
+          paddingY: "10px",
+          paddingX: "15px",
           backgroundColor: "#f8f9fa",
           justifyContent: "space-between",
           alignItems: "center",
+          position: "sticky",
         }}
       >
         <TextField

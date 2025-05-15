@@ -15,6 +15,7 @@ import { deleteDoc, doc, updateDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { useState, useRef } from "react";
 import FaceIcon from "@mui/icons-material/Face";
+import EditIcon from "@mui/icons-material/Edit";
 import colors from "../colors";
 import EmojiPicker from "emoji-picker-react";
 
@@ -70,7 +71,7 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
     });
     console.log("message has been updated");
 
-    setNewMessage("");
+    setNewMessage(newMessage);
     setOpenTextEdit(false);
   };
 
@@ -90,14 +91,27 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
             marginTop: "20px",
           }}
         >
-          <Chip
-            label={message.text}
-            onClick={handleClick}
-            sx={{ fontSize: "16px" }}
-            color={"secondary"}
-          />
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            sx={{ maxWidth: "100%" }}
+            alignItems={"end"}
+          >
+            <Chip
+              label={message.text}
+              onClick={handleClick}
+              sx={{
+                fontSize: "16px",
+                paddingY: "5px",
+                height: "auto",
+                "& .MuiChip-label": { display: "block", whiteSpace: "normal" },
+              }}
+              color={"secondary"}
+            />
 
-          {message.edit && <>{editedText()}</>}
+            {message.edit && <>{editedText()}</>}
+          </Box>
+
           <Menu
             anchorEl={anchorEl}
             open={open}
@@ -122,11 +136,13 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
                   width: "100%",
                 }}
               >
-                <DeleteIcon sx={{ marginRight: "5px" }} />
+                <DeleteIcon sx={{ marginRight: "8px" }} />
                 <Typography variant={"body2"}>Delete message</Typography>
               </Box>
               <Box
                 onClick={handleTextEdit}
+                display={"flex"}
+                alignItems={"center"}
                 marginTop={0.5}
                 sx={{
                   "&:hover": {
@@ -137,6 +153,7 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
                 }}
                 textAlign={"center"}
               >
+                <EditIcon sx={{ marginRight: "8px" }} />
                 <Typography variant={"body2"}>Edit</Typography>
               </Box>
             </MenuItem>
@@ -153,8 +170,20 @@ const DisplayMessage = ({ message, isOwnMessage }) => {
           <Box display={"flex"} alignItems={"center"} gap={1}>
             <Chip label={message.displayName} avatar={<FaceIcon />} />
           </Box>
-          <Box display={"flex"} flexDirection={"column"}>
-            <Chip label={message.text} sx={{ fontSize: "16px" }} />
+          <Box
+            display={"flex"}
+            flexDirection={"column"}
+            sx={{ maxWidth: "100%" }}
+          >
+            <Chip
+              label={message.text}
+              sx={{
+                fontSize: "16px",
+                paddingY: "5px",
+                height: "auto",
+                "& .MuiChip-label": { display: "block", whiteSpace: "normal" },
+              }}
+            />
             {message.edit && <>{editedText()}</>}
           </Box>
         </Box>

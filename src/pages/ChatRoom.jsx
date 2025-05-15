@@ -72,13 +72,15 @@ const ChatRoom = ({ user }) => {
                 display={"flex"}
                 flexDirection={isMobile ? "row" : "column"}
                 gap={1}
+                overflow={"scroll"}
+                height={isTablet ? "66vh" : "0"}
               >
                 {isTablet &&
                   loggedInUser
                     .filter((u) => u.user_id !== user.uid)
-                    .map((u) => (
+                    .map((u, i) => (
                       <Box
-                        key={u.user_id}
+                        key={i}
                         display={"flex"}
                         alignItems={"center"}
                         gap={1}
@@ -92,9 +94,11 @@ const ChatRoom = ({ user }) => {
                 {isMobile &&
                   loggedInUser
                     .filter((u) => u.user_id !== user.uid)
-                    .map((u) => (
-                      <CustomTooltip title={u.email} key={u.user_id} arrow>
-                        <Avatar />
+                    .map((u, i) => (
+                      <CustomTooltip title={u.email} key={i} arrow>
+                        <Box display={"flex"} gap={1}>
+                          <Avatar />
+                        </Box>
                       </CustomTooltip>
                     ))}
               </Box>
@@ -102,17 +106,16 @@ const ChatRoom = ({ user }) => {
           </Grid>
 
           <Grid item size={isTablet ? 8 : 12}>
-            <Container sx={{ marginTop: "25px" }}>
+            <Container sx={{ marginTop: isTablet ? "25px" : "15px" }}>
               <Paper
                 elevation={3}
                 sx={{
-                  overflowY: "scroll",
                   padding: "10px",
                   marginBottom: "10px",
+                  height: "70vh",
+                  overflow: "scroll",
                   // Hur ska det se ut när det inte finns något meddelande?
                 }}
-                
-                
               >
                 {messages.map((msg) => (
                   <DisplayMessage
