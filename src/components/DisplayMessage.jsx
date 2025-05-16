@@ -29,6 +29,7 @@ import EditIcon from "@mui/icons-material/Edit";
 import ReplyIcon from "@mui/icons-material/Reply";
 import colors from "../colors";
 import EmojiPicker from "emoji-picker-react";
+import DisplayReplyMessages from "./DisplayReplyMessages";
 
 const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -122,6 +123,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
       timestamp: serverTimestamp(),
     });
     setReplyText("");
+    setOpenReplyText(false);
   };
 
   useEffect(() => {
@@ -137,8 +139,6 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     return unsubscribe;
   }, []);
 
-  console.log(repliesMessages);
-
   return (
     <Box sx={{ margin: "10px" }}>
       {isOwnMessage ? (
@@ -147,14 +147,13 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
-            width: "100%",
             marginTop: "20px",
           }}
         >
           <Box
             display={"flex"}
             flexDirection={"column"}
-            sx={{ maxWidth: "100%" }}
+            sx={{ maxWidth: "70%" }}
             alignItems={"end"}
           >
             {message.edit && <>{editedText()}</>}
@@ -170,14 +169,10 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
               color={"secondary"}
             />
 
-            {message.reply && (
-              <>
-                {repliesNotice()}
-                {repliesMessages.map((doc, i) => (
-                  <Chip key={i} label={doc.text} />
-                ))}
-              </>
-            )}
+            <DisplayReplyMessages
+              replyBoolean={message.reply}
+              replyMessages={repliesMessages}
+            />
           </Box>
 
           <Menu
@@ -240,11 +235,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
             <Chip label={message.displayName} avatar={<FaceIcon />} />
           </Box>
 
-          <Box
-            display={"flex"}
-            flexDirection={"column"}
-            sx={{ maxWidth: "100%" }}
-          >
+          <Box sx={{ maxWidth: "70%" }}>
             <Chip
               label={message.text}
               sx={{
@@ -255,19 +246,13 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
               }}
               onClick={handleClick}
             />
-            {message.reply && (
-              <>
-                {repliesNotice()}
-                {repliesMessages.map((doc, i) => (
-                  <>
-                    <Chip label={doc.senderEmail} avatar={<FaceIcon />} />
-
-                    <Chip key={i} label={doc.text} />
-                  </>
-                ))}
-              </>
-            )}
           </Box>
+
+          <DisplayReplyMessages
+            replyBoolean={message.reply}
+            replyMessages={repliesMessages}
+          />
+
           <Menu
             anchorEl={anchorEl}
             open={open}
