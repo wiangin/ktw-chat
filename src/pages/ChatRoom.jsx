@@ -49,7 +49,7 @@ const ChatRoom = ({ user }) => {
     });
     return unsubscribe;
   }, []);
-
+  
   return (
     <Container
       sx={{
@@ -122,6 +122,7 @@ const ChatRoom = ({ user }) => {
                     key={msg.id}
                     message={msg}
                     isOwnMessage={user.uid === msg.user_id}
+                    user={user}
                   />
                 ))}
                 <Box ref={dummy} />

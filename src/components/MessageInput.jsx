@@ -22,6 +22,7 @@ const MessageInput = ({ user }) => {
       user_id: user.uid,
       displayName: user.email,
       edit: false,
+      reply: false,
     });
     setMessage("");
   };
