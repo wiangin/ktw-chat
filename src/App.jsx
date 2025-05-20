@@ -1,9 +1,6 @@
-import React from "react";
-import "./App.css";
 import { Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import SighUp from "./pages/Signup";
-import { Container } from "@mui/material";
 import ChatRoom from "./pages/ChatRoom";
 import useUserAuth from "./customHook/useUserAuth";
 import ResetPassword from "./pages/ResetPassword";

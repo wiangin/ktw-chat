@@ -9,6 +9,8 @@ import {
   Button,
   FormControl,
   Popover,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -23,7 +25,7 @@ import {
   onSnapshot,
 } from "firebase/firestore";
 import { db } from "../firebase";
-import { useState, useRef, use, useEffect } from "react";
+import { useState, useRef, useEffect } from "react";
 import FaceIcon from "@mui/icons-material/Face";
 import EditIcon from "@mui/icons-material/Edit";
 import ReplyIcon from "@mui/icons-material/Reply";
@@ -31,16 +33,21 @@ import colors from "../colors";
 import EmojiPicker from "emoji-picker-react";
 import DisplayReplyMessages from "./DisplayReplyMessages";
 
+
+
 const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [newMessage, setNewMessage] = useState(message.text);
-  const [openTextEdit, setOpenTextEdit] = useState(false);
+  const [toOpenTextEditForm, setToOpenTextEditForm] = useState(false);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const sendButtonRef = useRef(null);
-  const [openReplyText, setOpenReplyText] = useState(false);
+  const [ToOpenReplyTextForm, setToOpenReplyTextForm] = useState(false);
   const [replyText, setReplyText] = useState("");
   const [repliesMessages, setRepliesMessage] = useState([]);
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const editedText = () => {
     return (
@@ -49,18 +56,12 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
       </Typography>
     );
   };
-  const repliesNotice = () => {
-    return (
-      <Typography marginLeft={0.5} variant={"caption"} color={"grey"}>
-        Replied
-      </Typography>
-    );
-  };
 
   const handleDeleteMessage = async () => {
     try {
       const messageRef = doc(db, "messages", message.id);
       await deleteDoc(messageRef);
+      
     } catch (error) {
       console.log("Error deleting message: ", error);
     }
@@ -72,11 +73,11 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
   const handleClose = () => {
     setAnchorEl(null);
-    setOpenTextEdit(false);
+    setToOpenTextEditForm(false);
   };
 
   const handleTextEdit = (e) => {
-    setOpenTextEdit(true);
+    setToOpenTextEditForm(true);
     setAnchorEl(null);
   };
 
@@ -92,7 +93,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
       edit: true,
     });
     setNewMessage(newMessage);
-    setOpenTextEdit(false);
+    setToOpenTextEditForm(false);
   };
 
   const handleEmojiPicker = () => {
@@ -100,7 +101,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
   };
 
   const handleReply = () => {
-    setOpenReplyText(true);
+    setToOpenReplyTextForm(true);
     setAnchorEl(null);
   };
 
@@ -109,7 +110,6 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
   };
 
   const handleSendReplyMessage = async (e) => {
-    // send reply
     e.preventDefault();
     const messageRef = doc(db, "messages", message.id);
     await updateDoc(messageRef, {
@@ -123,7 +123,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
       timestamp: serverTimestamp(),
     });
     setReplyText("");
-    setOpenReplyText(false);
+    setToOpenReplyTextForm(false);
   };
 
   useEffect(() => {
@@ -171,7 +171,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
             <DisplayReplyMessages
               replyBoolean={message.reply}
-              replyMessages={repliesMessages}
+              repliesMessages={repliesMessages}
             />
           </Box>
 
@@ -250,7 +250,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
           <DisplayReplyMessages
             replyBoolean={message.reply}
-            replyMessages={repliesMessages}
+            repliesMessages={repliesMessages}
           />
 
           <Menu
@@ -285,13 +285,16 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
         </Box>
       )}
 
-      {openTextEdit && (
-        <Dialog open={openTextEdit} onClose={() => setOpenTextEdit(false)}>
-          <Box margin={6}>
+      {/* Dialog popup för att redigera sitt meddelande */}
+      {toOpenTextEditForm && (
+        <Dialog open={toOpenTextEditForm} onClose={() => setToOpenTextEditForm(false)} >
+          <Box margin={6} width={isTablet ? "500px" : "300px"} >
             <FormControl
               component={"form"}
               onSubmit={handleSendEditedMessage}
               ref={sendButtonRef}
+              sx={{ width:  isTablet ? "500px" : "300px"}}
+             
             >
               <TextField
                 type={"text"}
@@ -329,10 +332,10 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
         </Dialog>
       )}
 
-      {/* Dialog för att visa meddelandet som man vill svara på */}
-      {openReplyText && (
-        <Dialog open={openReplyText} onClose={() => setOpenReplyText(false)}>
-          <Box margin={3}>
+      {/* Dialog popup för att sparar på meddelande. */}
+      {ToOpenReplyTextForm && (
+        <Dialog open={ToOpenReplyTextForm} onClose={() => setToOpenReplyTextForm(false)}>
+          <Box margin={6}>
             <Chip
               label={message.text}
               sx={{
@@ -343,11 +346,12 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
               }}
             />
           </Box>
-          <Box margin={6}>
+          <Box margin={6} width={isTablet ? "500px" : "300px"}>
             <FormControl
               component={"form"}
               onSubmit={handleSendReplyMessage}
               ref={sendButtonRef}
+              sx={{ width:  isTablet ? "500px" : "300px"}}
             >
               <TextField
                 type={"text"}

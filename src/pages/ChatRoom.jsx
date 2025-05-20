@@ -16,6 +16,7 @@ import { collection, onSnapshot, orderBy, query } from "firebase/firestore";
 import DisplayMessage from "../components/DisplayMessage";
 import CustomTooltip from "../CustomComponent/CustomTooltip";
 
+
 const ChatRoom = ({ user }) => {
   const [messages, setMessages] = useState([]);
   const dummy = useRef();
@@ -23,6 +24,7 @@ const ChatRoom = ({ user }) => {
   const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [loggedInUser, setLoggedInUsers] = useState([]);
+
 
   useEffect(() => {
     const queryDb = query(collection(db, "messages"), orderBy("createdAt"));
@@ -49,7 +51,7 @@ const ChatRoom = ({ user }) => {
     });
     return unsubscribe;
   }, []);
-  
+
   return (
     <Container
       sx={{
