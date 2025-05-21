@@ -1,24 +1,19 @@
-import { Box, Typography, Chip, Menu, MenuItem } from "@mui/material";
+import { Box, Typography, Chip, Menu, MenuItem, Tooltip } from "@mui/material";
 import FaceIcon from "@mui/icons-material/Face";
 import DeleteIcon from "@mui/icons-material/Delete";
-import useUserAuth from "../customHook/useUserAuth";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { doc, deleteDoc } from "firebase/firestore";
 
-const repliesNotice = () => {
-  return (
-    <Typography marginLeft={0.5} variant={"caption"} color={"grey"}>
-      Replied
-    </Typography>
-  );
-};
-
-const DisplayReplyMessages = ({ replyBoolean, repliesMessages }) => {
-  const { user } = useUserAuth();
-  const loggedInUser = user?.uid;
+const DisplayReplyMessages = ({
+  replyBoolean,
+  repliesMessages,
+  isOwnMessage,
+  messageId,
+}) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
+  const [newDate, setNewDate] = useState("");
 
   const handleOnClick = (e) => {
     setAnchorEl(e.currentTarget);
@@ -27,78 +22,129 @@ const DisplayReplyMessages = ({ replyBoolean, repliesMessages }) => {
   const handleClose = () => {
     setAnchorEl(null);
   };
-// fixar funktion för att ta bort sitt svarande meddelande
+
   const handleDeleteReply = async () => {
     try {
-      console.log(repliesMessages);
-      
-      // const messageRef = doc(db, "replies", repliesMessages.id);
-      // await deleteDoc(messageRef);
-    }
-    catch (error) {
+      const messageRef = doc(
+        db,
+        "messages",
+        messageId?.id,
+        "replies",
+        repliesMessages.id
+      );
+      await deleteDoc(messageRef);
+      setAnchorEl(null);
+    } catch (error) {
       console.log("Error deleting message: ", error);
     }
-  }
+  };
 
+  useEffect(() => {
+    if (repliesMessages.createdAt) {
+      const { seconds } = repliesMessages.createdAt;
+      const date = new Date(seconds * 1000);
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      const formattedDate = date.toLocaleDateString("sv-SE", options);
+      setNewDate(formattedDate);
+    } else {
+      setNewDate("Unknown date");
+    }
+  }, [repliesMessages]);
 
   return (
-    <Box display={"flex"} flexDirection={"column"}>
+    <Box
+      display={"flex"}
+      flexDirection={"column"}
+      alignItems={isOwnMessage ? "end" : "start"}
+    >
       {replyBoolean && (
-        <Box marginLeft={2} display={"flex"} flexDirection={"column"}>
-          <Box marginRight={0.5}>{repliesNotice()}</Box>
-          {repliesMessages.map((doc, i) => (
-            <Box key={i}>
-              <Box>
-                {loggedInUser !== doc.senderId && (
-                  <Chip label={doc.senderEmail} avatar={<FaceIcon />} />
-                )}
-              </Box>
-              <Box marginBottom={1} marginLeft={1.5}>
-                {loggedInUser === doc.senderId ? (
-                  <>
-                    <Chip
-                      label={doc.text}
-                      color={"secondary"}
-                      onClick={handleOnClick}
-                    />
-                    <Menu
-                      anchorEl={anchorEl}
-                      open={open}
-                      onClose={handleClose}
-                      sx={{ marginTop: "8px" }}
+        <Box marginLeft={2} display={"flex"} flexDirection={"column"} >
+          <>
+            {isOwnMessage ? (
+              <>
+                <Tooltip title={newDate} placement={"right"}>
+                  <Chip
+                    onClick={handleOnClick}
+                    label={repliesMessages.text}
+                    color={"secondary"}
+                    // kanske kan göra objekt av denna styling för multi line Chip
+                    sx={{
+                      marginTop: "5px",
+                      fontSize: "16px",
+                      paddingY: "5px",
+                      height: "auto",
+                      "& .MuiChip-label": {
+                        display: "block",
+                        whiteSpace: "normal",
+                      },
+                    }}
+                  />
+                </Tooltip>
+
+                <Menu
+                  anchorEl={anchorEl}
+                  open={open}
+                  onClose={handleClose}
+                  sx={{ marginTop: "8px" }}
+                >
+                  <MenuItem
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                    }}
+                  >
+                    <Box
+                      onClick={handleDeleteReply}
+                      display={"flex"}
+                      alignItems={"center"}
+                      sx={{
+                        "&:hover": {
+                          backgroundColor: "lightGrey",
+                        },
+                        padding: "10px",
+                        width: "100%",
+                      }}
                     >
-                      <MenuItem
-                        sx={{
-                          display: "flex",
-                          flexDirection: "column",
-                        }}
-                      >
-                        <Box
-                        onClick ={handleDeleteReply}
-                          display={"flex"}
-                          alignItems={"center"}
-                          sx={{
-                            "&:hover": {
-                              backgroundColor: "lightGrey",
-                            },
-                            padding: "10px",
-                            width: "100%",
-                          }}
-                        >
-                          <DeleteIcon sx={{ marginRight: "8px" }} />
-                          <Typography variant={"body2"}>
-                            Delete message
-                          </Typography>
-                        </Box>
-                      </MenuItem>
-                    </Menu>
-                  </>
-                ) : (
-                  <Chip label={doc.text} />
-                )}
+                      <DeleteIcon sx={{ marginRight: "8px" }} />
+                      <Typography variant={"body2"}>Delete message</Typography>
+                    </Box>
+                  </MenuItem>
+                </Menu>
+              </>
+            ) : (
+              <Box display={"flex"} flexDirection={"column"} marginY={0.5}>
+                <Box display={"flex"} alignSelf={"end"}>
+                  <Chip
+                    label={repliesMessages.senderEmail}
+                    avatar={<FaceIcon />}
+                  />
+                </Box>
+
+                <Box marginLeft={1.8}>
+                  <Tooltip title={newDate} placement={"right"}>
+                    <Chip
+                      label={repliesMessages.text}
+                      sx={{
+                        fontSize: "16px",
+                        paddingY: "5px",
+                        height: "auto",
+                        "& .MuiChip-label": {
+                          display: "block",
+                          whiteSpace: "normal",
+                        },
+                      }}
+                    />
+                  </Tooltip>
+                </Box>
               </Box>
-            </Box>
-          ))}
+            )}
+          </>
         </Box>
       )}
     </Box>

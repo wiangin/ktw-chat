@@ -10,7 +10,8 @@ import {
   FormControl,
   Popover,
   useTheme,
-  useMediaQuery
+  useMediaQuery,
+  Tooltip,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import {
@@ -33,8 +34,6 @@ import colors from "../colors";
 import EmojiPicker from "emoji-picker-react";
 import DisplayReplyMessages from "./DisplayReplyMessages";
 
-
-
 const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
@@ -47,7 +46,8 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [repliesMessages, setRepliesMessage] = useState([]);
   const theme = useTheme();
   const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // kanske ta bort det senare
+  const [newDate, setNewDate] = useState("");
 
   const editedText = () => {
     return (
@@ -57,11 +57,18 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     );
   };
 
+  const repliesNotice = () => {
+    return (
+      <Typography marginLeft={0.5} variant={"caption"} color={"grey"}>
+        Replied
+      </Typography>
+    );
+  };
+
   const handleDeleteMessage = async () => {
     try {
       const messageRef = doc(db, "messages", message.id);
       await deleteDoc(messageRef);
-      
     } catch (error) {
       console.log("Error deleting message: ", error);
     }
@@ -115,21 +122,21 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     await updateDoc(messageRef, {
       reply: true,
     });
-    const repliesRef = collection(db, "messages", message.id, "replies");
-    await addDoc(repliesRef, {
+    const replyRef = collection(db, "messages", message.id, "replies");
+    await addDoc(replyRef, {
       text: replyText,
       senderId: user.uid,
       senderEmail: user.email,
-      timestamp: serverTimestamp(),
+      createdAt: serverTimestamp(),
     });
     setReplyText("");
     setToOpenReplyTextForm(false);
   };
 
   useEffect(() => {
-    const repliesMsg = collection(db, "messages", message.id, "replies");
-    const q = query(repliesMsg, orderBy("timestamp"));
-    const unsubscribe = onSnapshot(q, (snapshot) => {
+    const replyMsgRef = collection(db, "messages", message.id, "replies");
+    const queryReplyMsg = query(replyMsgRef, orderBy("createdAt"));
+    const unsubscribe = onSnapshot(queryReplyMsg, (snapshot) => {
       const replies = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
@@ -139,6 +146,40 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     return unsubscribe;
   }, []);
 
+  const loopingAndDisplayReplyMessages = () => {
+    const msg = repliesMessages.map((doc, i) => {
+      return (
+        <DisplayReplyMessages
+          key={i}
+          replyBoolean={message.reply}
+          repliesMessages={doc}
+          isOwnMessage={user.uid === doc.senderId}
+          messageId={message}
+        />
+      );
+    });
+    return msg;
+  };
+
+  // Datum och tid formatering
+  useEffect(() => {
+    if (message.createdAt) {
+      const { seconds } = message.createdAt;
+      const date = new Date(seconds * 1000);
+      const options = {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+      };
+      const formattedDate = date.toLocaleDateString("sv-SE", options);
+      setNewDate(formattedDate);
+    } else {
+      setNewDate("Unknown date");
+    }
+  }, [message]);
+
   return (
     <Box sx={{ margin: "10px" }}>
       {isOwnMessage ? (
@@ -147,7 +188,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
             display: "flex",
             flexDirection: "column",
             alignItems: "flex-end",
-            marginTop: "20px",
+            marginTop: "5px",
           }}
         >
           <Box
@@ -157,22 +198,32 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
             alignItems={"end"}
           >
             {message.edit && <>{editedText()}</>}
-            <Chip
-              label={message.text}
-              onClick={handleClick}
-              sx={{
-                fontSize: "16px",
-                paddingY: "5px",
-                height: "auto",
-                "& .MuiChip-label": { display: "block", whiteSpace: "normal" },
-              }}
-              color={"secondary"}
-            />
+            <Tooltip title={newDate} placement={"left"}>
+              <Chip
+                label={message.text}
+                onClick={handleClick}
+                sx={{
+                  fontSize: "16px",
+                  paddingY: "5px",
+                  height: "auto",
+                  "& .MuiChip-label": {
+                    display: "block",
+                    whiteSpace: "normal",
+                  },
+                }}
+                color={"secondary"}
+              />
+            </Tooltip>
 
-            <DisplayReplyMessages
-              replyBoolean={message.reply}
-              repliesMessages={repliesMessages}
-            />
+            {repliesMessages.length > 0 && (
+              <>
+                {message.reply && (
+                  <Box marginRight={0.5}>{repliesNotice()}</Box>
+                )}
+              </>
+            )}
+
+            {loopingAndDisplayReplyMessages()}
           </Box>
 
           <Menu
@@ -228,30 +279,37 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
           display={"flex"}
           flexDirection={"column"}
           alignItems={"start"}
-          gap={"10px"}
         >
           <Box display={"flex"} flexDirection={"column"} alignItems={"start"}>
             {message.edit && <>{editedText()}</>}
+
             <Chip label={message.displayName} avatar={<FaceIcon />} />
+            <Box sx={{ maxWidth: "70%" }} marginLeft={1.5}>
+              <Tooltip title={newDate} placement={"right"}>
+                <Chip
+                  label={message.text}
+                  sx={{
+                    fontSize: "16px",
+                    paddingY: "5px",
+                    height: "auto",
+                    "& .MuiChip-label": {
+                      display: "block",
+                      whiteSpace: "normal",
+                    },
+                  }}
+                  onClick={handleClick}
+                />
+              </Tooltip>
+            </Box>
           </Box>
 
-          <Box sx={{ maxWidth: "70%" }}>
-            <Chip
-              label={message.text}
-              sx={{
-                fontSize: "16px",
-                paddingY: "5px",
-                height: "auto",
-                "& .MuiChip-label": { display: "block", whiteSpace: "normal" },
-              }}
-              onClick={handleClick}
-            />
-          </Box>
+          {repliesMessages.length > 0 && (
+            <>
+              {message.reply && <Box marginRight={0.5}>{repliesNotice()}</Box>}
+            </>
+          )}
 
-          <DisplayReplyMessages
-            replyBoolean={message.reply}
-            repliesMessages={repliesMessages}
-          />
+          {loopingAndDisplayReplyMessages()}
 
           <Menu
             anchorEl={anchorEl}
@@ -287,14 +345,16 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
       {/* Dialog popup för att redigera sitt meddelande */}
       {toOpenTextEditForm && (
-        <Dialog open={toOpenTextEditForm} onClose={() => setToOpenTextEditForm(false)} >
-          <Box margin={6} width={isTablet ? "500px" : "300px"} >
+        <Dialog
+          open={toOpenTextEditForm}
+          onClose={() => setToOpenTextEditForm(false)}
+        >
+          <Box margin={6} width={isTablet ? "500px" : "300px"}>
             <FormControl
               component={"form"}
               onSubmit={handleSendEditedMessage}
               ref={sendButtonRef}
-              sx={{ width:  isTablet ? "500px" : "300px"}}
-             
+              sx={{ width: isTablet ? "500px" : "300px" }}
             >
               <TextField
                 type={"text"}
@@ -334,7 +394,10 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
       {/* Dialog popup för att sparar på meddelande. */}
       {ToOpenReplyTextForm && (
-        <Dialog open={ToOpenReplyTextForm} onClose={() => setToOpenReplyTextForm(false)}>
+        <Dialog
+          open={ToOpenReplyTextForm}
+          onClose={() => setToOpenReplyTextForm(false)}
+        >
           <Box margin={6}>
             <Chip
               label={message.text}
@@ -351,7 +414,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
               component={"form"}
               onSubmit={handleSendReplyMessage}
               ref={sendButtonRef}
-              sx={{ width:  isTablet ? "500px" : "300px"}}
+              sx={{ width: isTablet ? "500px" : "300px" }}
             >
               <TextField
                 type={"text"}

@@ -84,7 +84,7 @@ const Login = () => {
                 required
                 value={email}
                 onChange={handleEmailChange}
-                color="secondary"
+                color={"secondary"}
                 
               />
             </Box>
@@ -99,7 +99,7 @@ const Login = () => {
                 required
                 value={password}
                 onChange={handlePasswordChange}
-                color="secondary"
+                color={"secondary"}
               />
             </Box>
 

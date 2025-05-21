@@ -1,5 +1,3 @@
-
-
 const colors = {
     bgViolet: "#7b1fa2",
 }
