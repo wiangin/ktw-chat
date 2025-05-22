@@ -13,9 +13,10 @@ import { auth, db } from "../firebase";
 import { useNavigate } from "react-router-dom";
 import useUserAuth from "../customHook/useUserAuth";
 import { useState } from "react";
-import colors from "../colors";
+import colors from "../utility/colors";
 import { deleteDoc, doc } from "firebase/firestore";
 import CustomTooltip from "../CustomComponent/CustomTooltip";
+import { lightGreyBgHover } from "../utility/lightGreyBgHover";
 
 const Navbar = () => {
   const { user } = useUserAuth();
@@ -79,14 +80,7 @@ const Navbar = () => {
               onClick={handleSignOut}
               sx={{ display: "flex", flexDirection: "column" }}
             >
-              <Box
-                textAlign={"center"}
-                sx={{
-                  "&:hover": { backgroundColor: "lightGrey" },
-                  width: "100%",
-                  padding: "5px",
-                }}
-              >
+              <Box textAlign={"center"} sx={lightGreyBgHover}>
                 <Typography variant={"body2"}>Log Out</Typography>
               </Box>
             </MenuItem>

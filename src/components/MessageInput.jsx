@@ -3,7 +3,7 @@ import { useState } from "react";
 import EmojiPicker from "emoji-picker-react";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db } from "../firebase";
-import colors from "../colors";
+import colors from "../utility/colors";
 
 const MessageInput = ({ user }) => {
   const [message, setMessage] = useState("");

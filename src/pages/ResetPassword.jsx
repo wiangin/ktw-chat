@@ -8,10 +8,9 @@ import {
   Typography,
   Dialog,
 } from "@mui/material";
-import colors from "../colors";
+import colors from "../utility/colors";
 import { auth } from "../firebase";
 import { sendPasswordResetEmail } from "firebase/auth";
-
 
 const ResetPassword = () => {
   const [email, setEmail] = useState("");

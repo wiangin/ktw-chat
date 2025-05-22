@@ -18,7 +18,7 @@ function App() {
         path={"/chatroom"}
         element={user ? <ChatRoom user={user} /> : <Navigate to={"/"} />}
       />
-      <Route path={"/resetpassword" }element={<ResetPassword/>}/>
+      <Route path={"/resetpassword"} element={<ResetPassword />} />
     </Routes>
   );
 }

@@ -1,9 +1,32 @@
-import { Box, Typography, Chip, Menu, MenuItem, Tooltip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  Chip,
+  Menu,
+  MenuItem,
+  Tooltip,
+  Dialog,
+  useTheme,
+  useMediaQuery,
+  FormControl,
+  TextField,
+  Button,
+  Popover
+} from "@mui/material";
 import FaceIcon from "@mui/icons-material/Face";
 import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, updateDoc } from "firebase/firestore";
+import {
+  multiLineChipStyleWithMarginTop,
+  multiLineChipStyle,
+} from "../utility/multiLinesChipStyle";
+import { lightGreyBgHover } from "../utility/lightGreyBgHover";
+import EditIcon from "@mui/icons-material/Edit";
+import EmojiPicker from "emoji-picker-react";
+import colors from "../utility/colors";
+import DisplayEditedNotice from "./DisplayEditedNotice";
 
 const DisplayReplyMessages = ({
   replyBoolean,
@@ -14,8 +37,14 @@ const DisplayReplyMessages = ({
   const [anchorEl, setAnchorEl] = useState(null);
   const open = Boolean(anchorEl);
   const [newDate, setNewDate] = useState("");
+  const [newMessage, setNewMessage] = useState(repliesMessages.text);
+  const [toOpenTextEditForm, setToOpenTextEditForm] = useState(false);
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const theme = useTheme();
+  const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
+  const [isDeleted, setIsDeleted] = useState(false);
 
-  const handleOnClick = (e) => {
+  const handleOnClickOpenMenu = (e) => {
     setAnchorEl(e.currentTarget);
   };
 
@@ -24,6 +53,7 @@ const DisplayReplyMessages = ({
   };
 
   const handleDeleteReply = async () => {
+    // setIsDeleted(true)
     try {
       const messageRef = doc(
         db,
@@ -34,9 +64,48 @@ const DisplayReplyMessages = ({
       );
       await deleteDoc(messageRef);
       setAnchorEl(null);
+      
     } catch (error) {
       console.log("Error deleting message: ", error);
     }
+  };
+
+  const handleTextEdit = () => {
+      if(newMessage === "") {
+      setNewMessage(repliesMessages.text);
+    }
+    setToOpenTextEditForm(true);
+    setAnchorEl(null);
+  };
+
+  const handleNewMessageOnchange = (e) => {
+    setNewMessage(e.target.value);
+  };
+
+  const handleSendEditedMessage = async (e) => {
+    e.preventDefault();
+    if (!newMessage.trim()) return;
+    try {
+      const messageRef = doc(
+        db,
+        "messages",
+        messageId?.id,
+        "replies",
+        repliesMessages.id
+      );
+      await updateDoc(messageRef, {
+        text: newMessage,
+        edit: true,
+      });
+      setToOpenTextEditForm(false);
+      setNewMessage("");
+    } catch (error) {
+      console.log("Error updating message: ", error);
+    }
+  };
+
+  const handleEmojiPicker = () => {
+    setShowEmojiPicker(!showEmojiPicker);
   };
 
   useEffect(() => {
@@ -57,6 +126,9 @@ const DisplayReplyMessages = ({
     }
   }, [repliesMessages]);
 
+  console.log(isDeleted);
+  
+
   return (
     <Box
       display={"flex"}
@@ -64,88 +136,119 @@ const DisplayReplyMessages = ({
       alignItems={isOwnMessage ? "end" : "start"}
     >
       {replyBoolean && (
-        <Box marginLeft={2} display={"flex"} flexDirection={"column"} >
-          <>
-            {isOwnMessage ? (
-              <>
-                <Tooltip title={newDate} placement={"right"}>
-                  <Chip
-                    onClick={handleOnClick}
-                    label={repliesMessages.text}
-                    color={"secondary"}
-                    // kanske kan göra objekt av denna styling för multi line Chip
-                    sx={{
-                      marginTop: "5px",
-                      fontSize: "16px",
-                      paddingY: "5px",
-                      height: "auto",
-                      "& .MuiChip-label": {
-                        display: "block",
-                        whiteSpace: "normal",
-                      },
-                    }}
-                  />
-                </Tooltip>
+        <>
 
-                <Menu
-                  anchorEl={anchorEl}
-                  open={open}
-                  onClose={handleClose}
-                  sx={{ marginTop: "8px" }}
+          {isOwnMessage ? (
+            <Box marginLeft={2} display={"flex"} flexDirection={"column"}>
+              <Tooltip title={newDate} placement={"right"}>
+                <Chip
+                  onClick={handleOnClickOpenMenu}
+                  label={repliesMessages.text}
+                  color={"secondary"}
+                  sx={multiLineChipStyleWithMarginTop}
+                />
+              </Tooltip>
+              {/* {isDeleted && <Chip label={"Message has been deleted!"} color={"secondary"} />} */}
+              {repliesMessages.edit && <DisplayEditedNotice />}
+              <Menu
+                anchorEl={anchorEl}
+                open={open}
+                onClose={handleClose}
+                sx={{ marginTop: "8px" }}
+              >
+                <MenuItem
+                  sx={{
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
                 >
-                  <MenuItem
-                    sx={{
-                      display: "flex",
-                      flexDirection: "column",
-                    }}
+                  <Box
+                    onClick={handleDeleteReply}
+                    display={"flex"}
+                    alignItems={"center"}
+                    sx={lightGreyBgHover}
                   >
-                    <Box
-                      onClick={handleDeleteReply}
-                      display={"flex"}
-                      alignItems={"center"}
-                      sx={{
-                        "&:hover": {
-                          backgroundColor: "lightGrey",
-                        },
-                        padding: "10px",
-                        width: "100%",
-                      }}
-                    >
-                      <DeleteIcon sx={{ marginRight: "8px" }} />
-                      <Typography variant={"body2"}>Delete message</Typography>
-                    </Box>
-                  </MenuItem>
-                </Menu>
-              </>
-            ) : (
-              <Box display={"flex"} flexDirection={"column"} marginY={0.5}>
-                <Box display={"flex"} alignSelf={"end"}>
-                  <Chip
-                    label={repliesMessages.senderEmail}
-                    avatar={<FaceIcon />}
-                  />
-                </Box>
-
-                <Box marginLeft={1.8}>
-                  <Tooltip title={newDate} placement={"right"}>
-                    <Chip
-                      label={repliesMessages.text}
-                      sx={{
-                        fontSize: "16px",
-                        paddingY: "5px",
-                        height: "auto",
-                        "& .MuiChip-label": {
-                          display: "block",
-                          whiteSpace: "normal",
-                        },
-                      }}
-                    />
-                  </Tooltip>
-                </Box>
+                    <DeleteIcon sx={{ marginRight: "8px" }} />
+                    <Typography variant={"body2"}>Delete message</Typography>
+                  </Box>
+                  <Box
+                    onClick={handleTextEdit}
+                    display={"flex"}
+                    alignItems={"center"}
+                    marginTop={0.5}
+                    sx={lightGreyBgHover}
+                    textAlign={"center"}
+                  >
+                    <EditIcon sx={{ marginRight: "8px" }} />
+                    <Typography variant={"body2"}>Edit</Typography>
+                  </Box>
+                </MenuItem>
+              </Menu>
+            </Box>
+          ) : (
+            <Box display={"flex"} flexDirection={"column"} marginY={0.5}>
+              <Box display={"flex"} alignSelf={"end"}>
+                <Chip
+                  label={repliesMessages.senderEmail}
+                  avatar={<FaceIcon />}
+                />
               </Box>
-            )}
-          </>
-        </Box>
+
+              <Box marginLeft={1.8}>
+                <Tooltip title={newDate} placement={"right"}>
+                  <Chip label={repliesMessages.text} sx={multiLineChipStyle} />
+                </Tooltip>
+              </Box>
+            </Box>
+          )}
+        </>
+      )}
+      {toOpenTextEditForm && (
+        <Dialog
+          open={toOpenTextEditForm}
+          onClose={() => setToOpenTextEditForm(false)}
+        >
+          <Box margin={6} width={isTablet ? "500px" : "300px"}>
+            <FormControl
+              component={"form"}
+              onSubmit={handleSendEditedMessage}
+              // ref={sendButtonRef}
+              sx={{ width: isTablet ? "500px" : "300px" }}
+            >
+              <TextField
+                type={"text"}
+                value={newMessage}
+                onChange={handleNewMessageOnchange}
+                placeholder={"Type a message ..."}
+                size="small"
+                fullWidth
+              />
+              <Button onClick={handleEmojiPicker}>😊</Button>
+              <Button
+                sx={{ marginTop: "5px", bgcolor: colors.bgViolet }}
+                onClick={handleSendEditedMessage}
+                variant={"contained"}
+              >
+                Send
+              </Button>
+
+              {showEmojiPicker && (
+                <Popover
+                  open={showEmojiPicker}
+                  onClose={() => setShowEmojiPicker(false)}
+                >
+                  <EmojiPicker
+                    onEmojiClick={(emoji) =>
+                      setNewMessage(newMessage + emoji.emoji)
+                    }
+                    height={500}
+                    width={300}
+                  />
+                </Popover>
+              )}
+            </FormControl>
+          </Box>
+        </Dialog>
       )}
     </Box>
   );

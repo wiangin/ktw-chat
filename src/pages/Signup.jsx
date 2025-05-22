@@ -11,7 +11,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { auth } from "../firebase";
-import colors from "../colors";
+import colors from "../utility/colors";
 import { setUserToDb } from "../utility/setUserToDb";
 
 const SighUp = () => {

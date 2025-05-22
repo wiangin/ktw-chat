@@ -30,9 +30,13 @@ import { useState, useRef, useEffect } from "react";
 import FaceIcon from "@mui/icons-material/Face";
 import EditIcon from "@mui/icons-material/Edit";
 import ReplyIcon from "@mui/icons-material/Reply";
-import colors from "../colors";
+import colors from "../utility/colors";
 import EmojiPicker from "emoji-picker-react";
 import DisplayReplyMessages from "./DisplayReplyMessages";
+import { multiLineChipStyle } from "../utility/multiLinesChipStyle";
+import { lightGreyBgHover } from "../utility/lightGreyBgHover";
+import DisplayEditedNotice from "./DisplayEditedNotice";
+import DisplayRepliedNotice from "./DisplayRepliedNotice";
 
 const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -46,24 +50,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [repliesMessages, setRepliesMessage] = useState([]);
   const theme = useTheme();
   const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm")); // kanske ta bort det senare
   const [newDate, setNewDate] = useState("");
-
-  const editedText = () => {
-    return (
-      <Typography marginLeft={0.5} variant={"caption"} color={"grey"}>
-        Edited
-      </Typography>
-    );
-  };
-
-  const repliesNotice = () => {
-    return (
-      <Typography marginLeft={0.5} variant={"caption"} color={"grey"}>
-        Replied
-      </Typography>
-    );
-  };
 
   const handleDeleteMessage = async () => {
     try {
@@ -74,7 +61,8 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     }
   };
 
-  const handleClick = (e) => {
+  // Här måste det vara en bättre namn på funktionen
+  const handleOnClickOpenMenu = (e) => {
     setAnchorEl(e.currentTarget);
   };
 
@@ -83,7 +71,10 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     setToOpenTextEditForm(false);
   };
 
-  const handleTextEdit = (e) => {
+  const handleTextEdit = () => {
+    if(newMessage === "") {
+      setNewMessage(message.text);
+    }
     setToOpenTextEditForm(true);
     setAnchorEl(null);
   };
@@ -94,13 +85,18 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
   const handleSendEditedMessage = async (e) => {
     e.preventDefault();
-    const messageRef = doc(db, "messages", message.id);
-    await updateDoc(messageRef, {
-      text: newMessage,
-      edit: true,
-    });
-    setNewMessage(newMessage);
-    setToOpenTextEditForm(false);
+    if (!newMessage.trim()) return;
+    try {
+      const messageRef = doc(db, "messages", message.id);
+      await updateDoc(messageRef, {
+        text: newMessage,
+        edit: true,
+      });
+      setNewMessage(newMessage);
+      setToOpenTextEditForm(false);
+    } catch (error) {
+      console.log("Error updating message: ", error);
+    }
   };
 
   const handleEmojiPicker = () => {
@@ -128,6 +124,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
       senderId: user.uid,
       senderEmail: user.email,
       createdAt: serverTimestamp(),
+      edit: false,
     });
     setReplyText("");
     setToOpenReplyTextForm(false);
@@ -197,20 +194,12 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
             sx={{ maxWidth: "70%" }}
             alignItems={"end"}
           >
-            {message.edit && <>{editedText()}</>}
+            {message.edit && <DisplayEditedNotice />}
             <Tooltip title={newDate} placement={"left"}>
               <Chip
                 label={message.text}
-                onClick={handleClick}
-                sx={{
-                  fontSize: "16px",
-                  paddingY: "5px",
-                  height: "auto",
-                  "& .MuiChip-label": {
-                    display: "block",
-                    whiteSpace: "normal",
-                  },
-                }}
+                onClick={handleOnClickOpenMenu}
+                sx={multiLineChipStyle}
                 color={"secondary"}
               />
             </Tooltip>
@@ -218,7 +207,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
             {repliesMessages.length > 0 && (
               <>
                 {message.reply && (
-                  <Box marginRight={0.5}>{repliesNotice()}</Box>
+                  <Box marginRight={0.5}>{<DisplayRepliedNotice />}</Box>
                 )}
               </>
             )}
@@ -242,29 +231,19 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
                 onClick={handleDeleteMessage}
                 display={"flex"}
                 alignItems={"center"}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "lightGrey",
-                  },
-                  padding: "10px",
-                  width: "100%",
-                }}
+                sx={lightGreyBgHover}
               >
                 <DeleteIcon sx={{ marginRight: "8px" }} />
                 <Typography variant={"body2"}>Delete message</Typography>
               </Box>
+
+              {/* kankse kan skapa en komonent för denna? */}
               <Box
                 onClick={handleTextEdit}
                 display={"flex"}
                 alignItems={"center"}
                 marginTop={0.5}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "lightGrey",
-                  },
-                  padding: "10px",
-                  width: "100%",
-                }}
+                sx={lightGreyBgHover}
                 textAlign={"center"}
               >
                 <EditIcon sx={{ marginRight: "8px" }} />
@@ -281,23 +260,15 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
           alignItems={"start"}
         >
           <Box display={"flex"} flexDirection={"column"} alignItems={"start"}>
-            {message.edit && <>{editedText()}</>}
+            {message.edit && <DisplayEditedNotice />}
 
             <Chip label={message.displayName} avatar={<FaceIcon />} />
             <Box sx={{ maxWidth: "70%" }} marginLeft={1.5}>
               <Tooltip title={newDate} placement={"right"}>
                 <Chip
                   label={message.text}
-                  sx={{
-                    fontSize: "16px",
-                    paddingY: "5px",
-                    height: "auto",
-                    "& .MuiChip-label": {
-                      display: "block",
-                      whiteSpace: "normal",
-                    },
-                  }}
-                  onClick={handleClick}
+                  sx={multiLineChipStyle}
+                  onClick={handleOnClickOpenMenu}
                 />
               </Tooltip>
             </Box>
@@ -305,7 +276,9 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
           {repliesMessages.length > 0 && (
             <>
-              {message.reply && <Box marginRight={0.5}>{repliesNotice()}</Box>}
+              {message.reply && (
+                <Box marginRight={0.5}>{<DisplayRepliedNotice />}</Box>
+              )}
             </>
           )}
 
@@ -327,13 +300,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
                 onClick={handleReply}
                 display={"flex"}
                 alignItems={"center"}
-                sx={{
-                  "&:hover": {
-                    backgroundColor: "lightGrey",
-                  },
-                  padding: "10px",
-                  width: "100%",
-                }}
+                sx={lightGreyBgHover}
               >
                 <ReplyIcon sx={{ marginRight: "8px" }} />
                 <Typography variant={"body2"}>Reply</Typography>
@@ -399,15 +366,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
           onClose={() => setToOpenReplyTextForm(false)}
         >
           <Box margin={6}>
-            <Chip
-              label={message.text}
-              sx={{
-                fontSize: "16px",
-                paddingY: "5px",
-                height: "auto",
-                "& .MuiChip-label": { display: "block", whiteSpace: "normal" },
-              }}
-            />
+            <Chip label={message.text} sx={multiLineChipStyle} />
           </Box>
           <Box margin={6} width={isTablet ? "500px" : "300px"}>
             <FormControl

@@ -13,9 +13,8 @@ import {
   styled,
 } from "@mui/material";
 import "@fontsource/roboto/400.css";
-import colors from "../colors";
+import colors from "../utility/colors";
 import { setUserToDb } from "../utility/setUserToDb";
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -85,7 +84,6 @@ const Login = () => {
                 value={email}
                 onChange={handleEmailChange}
                 color={"secondary"}
-                
               />
             </Box>
 
