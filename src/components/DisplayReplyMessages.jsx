@@ -1,6 +1,5 @@
 import {
   Box,
-  Typography,
   Chip,
   Menu,
   MenuItem,
@@ -11,10 +10,9 @@ import {
   FormControl,
   TextField,
   Button,
-  Popover
+  Popover,
 } from "@mui/material";
 import FaceIcon from "@mui/icons-material/Face";
-import DeleteIcon from "@mui/icons-material/Delete";
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
 import { doc, deleteDoc, updateDoc } from "firebase/firestore";
@@ -22,11 +20,10 @@ import {
   multiLineChipStyleWithMarginTop,
   multiLineChipStyle,
 } from "../utility/multiLinesChipStyle";
-import { lightGreyBgHover } from "../utility/lightGreyBgHover";
-import EditIcon from "@mui/icons-material/Edit";
 import EmojiPicker from "emoji-picker-react";
 import colors from "../utility/colors";
 import DisplayEditedNotice from "./DisplayEditedNotice";
+import MenuItemContents from "./MenuItemContents";
 
 const DisplayReplyMessages = ({
   replyBoolean,
@@ -42,7 +39,6 @@ const DisplayReplyMessages = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const theme = useTheme();
   const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
-  const [isDeleted, setIsDeleted] = useState(false);
 
   const handleOnClickOpenMenu = (e) => {
     setAnchorEl(e.currentTarget);
@@ -53,7 +49,6 @@ const DisplayReplyMessages = ({
   };
 
   const handleDeleteReply = async () => {
-    // setIsDeleted(true)
     try {
       const messageRef = doc(
         db,
@@ -64,14 +59,13 @@ const DisplayReplyMessages = ({
       );
       await deleteDoc(messageRef);
       setAnchorEl(null);
-      
     } catch (error) {
       console.log("Error deleting message: ", error);
     }
   };
 
   const handleTextEdit = () => {
-      if(newMessage === "") {
+    if (newMessage === "") {
       setNewMessage(repliesMessages.text);
     }
     setToOpenTextEditForm(true);
@@ -126,9 +120,6 @@ const DisplayReplyMessages = ({
     }
   }, [repliesMessages]);
 
-  console.log(isDeleted);
-  
-
   return (
     <Box
       display={"flex"}
@@ -137,7 +128,6 @@ const DisplayReplyMessages = ({
     >
       {replyBoolean && (
         <>
-
           {isOwnMessage ? (
             <Box marginLeft={2} display={"flex"} flexDirection={"column"}>
               <Tooltip title={newDate} placement={"right"}>
@@ -148,7 +138,7 @@ const DisplayReplyMessages = ({
                   sx={multiLineChipStyleWithMarginTop}
                 />
               </Tooltip>
-              {/* {isDeleted && <Chip label={"Message has been deleted!"} color={"secondary"} />} */}
+
               {repliesMessages.edit && <DisplayEditedNotice />}
               <Menu
                 anchorEl={anchorEl}
@@ -162,26 +152,10 @@ const DisplayReplyMessages = ({
                     flexDirection: "column",
                   }}
                 >
-                  <Box
-                    onClick={handleDeleteReply}
-                    display={"flex"}
-                    alignItems={"center"}
-                    sx={lightGreyBgHover}
-                  >
-                    <DeleteIcon sx={{ marginRight: "8px" }} />
-                    <Typography variant={"body2"}>Delete message</Typography>
-                  </Box>
-                  <Box
-                    onClick={handleTextEdit}
-                    display={"flex"}
-                    alignItems={"center"}
-                    marginTop={0.5}
-                    sx={lightGreyBgHover}
-                    textAlign={"center"}
-                  >
-                    <EditIcon sx={{ marginRight: "8px" }} />
-                    <Typography variant={"body2"}>Edit</Typography>
-                  </Box>
+                  <MenuItemContents
+                    isHandleDeleteMessage={handleDeleteReply}
+                    isHandleTextEdit={handleTextEdit}
+                  />
                 </MenuItem>
               </Menu>
             </Box>
@@ -203,6 +177,8 @@ const DisplayReplyMessages = ({
           )}
         </>
       )}
+
+      {/* Dialog popup för att redigera på meddelande. */}
       {toOpenTextEditForm && (
         <Dialog
           open={toOpenTextEditForm}
@@ -212,7 +188,6 @@ const DisplayReplyMessages = ({
             <FormControl
               component={"form"}
               onSubmit={handleSendEditedMessage}
-              // ref={sendButtonRef}
               sx={{ width: isTablet ? "500px" : "300px" }}
             >
               <TextField

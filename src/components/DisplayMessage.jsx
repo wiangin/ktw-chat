@@ -13,7 +13,6 @@ import {
   useMediaQuery,
   Tooltip,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
 import {
   deleteDoc,
   doc,
@@ -28,7 +27,6 @@ import {
 import { db } from "../firebase";
 import { useState, useRef, useEffect } from "react";
 import FaceIcon from "@mui/icons-material/Face";
-import EditIcon from "@mui/icons-material/Edit";
 import ReplyIcon from "@mui/icons-material/Reply";
 import colors from "../utility/colors";
 import EmojiPicker from "emoji-picker-react";
@@ -37,6 +35,7 @@ import { multiLineChipStyle } from "../utility/multiLinesChipStyle";
 import { lightGreyBgHover } from "../utility/lightGreyBgHover";
 import DisplayEditedNotice from "./DisplayEditedNotice";
 import DisplayRepliedNotice from "./DisplayRepliedNotice";
+import MenuItemContents from "./MenuItemContents";
 
 const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -61,7 +60,6 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
     }
   };
 
-  // Här måste det vara en bättre namn på funktionen
   const handleOnClickOpenMenu = (e) => {
     setAnchorEl(e.currentTarget);
   };
@@ -72,7 +70,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
   };
 
   const handleTextEdit = () => {
-    if(newMessage === "") {
+    if (newMessage === "") {
       setNewMessage(message.text);
     }
     setToOpenTextEditForm(true);
@@ -227,28 +225,10 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
                 flexDirection: "column",
               }}
             >
-              <Box
-                onClick={handleDeleteMessage}
-                display={"flex"}
-                alignItems={"center"}
-                sx={lightGreyBgHover}
-              >
-                <DeleteIcon sx={{ marginRight: "8px" }} />
-                <Typography variant={"body2"}>Delete message</Typography>
-              </Box>
-
-              {/* kankse kan skapa en komonent för denna? */}
-              <Box
-                onClick={handleTextEdit}
-                display={"flex"}
-                alignItems={"center"}
-                marginTop={0.5}
-                sx={lightGreyBgHover}
-                textAlign={"center"}
-              >
-                <EditIcon sx={{ marginRight: "8px" }} />
-                <Typography variant={"body2"}>Edit</Typography>
-              </Box>
+              <MenuItemContents
+                isHandleDeleteMessage={handleDeleteMessage}
+                isHandleTextEdit={handleTextEdit}
+              />
             </MenuItem>
           </Menu>
         </Box>
@@ -261,7 +241,6 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
         >
           <Box display={"flex"} flexDirection={"column"} alignItems={"start"}>
             {message.edit && <DisplayEditedNotice />}
-
             <Chip label={message.displayName} avatar={<FaceIcon />} />
             <Box sx={{ maxWidth: "70%" }} marginLeft={1.5}>
               <Tooltip title={newDate} placement={"right"}>
@@ -359,7 +338,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
         </Dialog>
       )}
 
-      {/* Dialog popup för att sparar på meddelande. */}
+      {/* Dialog popup för att svara på meddelande. */}
       {ToOpenReplyTextForm && (
         <Dialog
           open={ToOpenReplyTextForm}
