@@ -36,6 +36,7 @@ import { lightGreyBgHover } from "../utility/lightGreyBgHover";
 import DisplayEditedNotice from "./DisplayEditedNotice";
 import DisplayRepliedNotice from "./DisplayRepliedNotice";
 import MenuItemContents from "./MenuItemContents";
+import TextEditDialog from "./TextEditDialog";
 
 const DisplayMessage = ({ message, isOwnMessage, user }) => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -241,6 +242,7 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
         >
           <Box display={"flex"} flexDirection={"column"} alignItems={"start"}>
             {message.edit && <DisplayEditedNotice />}
+
             <Chip label={message.displayName} avatar={<FaceIcon />} />
             <Box sx={{ maxWidth: "70%" }} marginLeft={1.5}>
               <Tooltip title={newDate} placement={"right"}>
@@ -291,51 +293,14 @@ const DisplayMessage = ({ message, isOwnMessage, user }) => {
 
       {/* Dialog popup för att redigera sitt meddelande */}
       {toOpenTextEditForm && (
-        <Dialog
-          open={toOpenTextEditForm}
-          onClose={() => setToOpenTextEditForm(false)}
-        >
-          <Box margin={6} width={isTablet ? "500px" : "300px"}>
-            <FormControl
-              component={"form"}
-              onSubmit={handleSendEditedMessage}
-              ref={sendButtonRef}
-              sx={{ width: isTablet ? "500px" : "300px" }}
-            >
-              <TextField
-                type={"text"}
-                value={newMessage}
-                onChange={handleNewMessageOnchange}
-                placeholder={"Type a message ..."}
-                size="small"
-                fullWidth
-              />
-              <Button onClick={handleEmojiPicker}>😊</Button>
-              <Button
-                sx={{ marginTop: "5px", bgcolor: colors.bgViolet }}
-                onClick={handleSendEditedMessage}
-                variant={"contained"}
-              >
-                Send
-              </Button>
-
-              {showEmojiPicker && (
-                <Popover
-                  open={showEmojiPicker}
-                  onClose={() => setShowEmojiPicker(false)}
-                >
-                  <EmojiPicker
-                    onEmojiClick={(emoji) =>
-                      setNewMessage(newMessage + emoji.emoji)
-                    }
-                    height={500}
-                    width={300}
-                  />
-                </Popover>
-              )}
-            </FormControl>
-          </Box>
-        </Dialog>
+        <TextEditDialog
+          toOpenTextEditForm={toOpenTextEditForm}
+          setToOpenTextEditForm={setToOpenTextEditForm}
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          handleNewMessageOnchange={handleNewMessageOnchange}
+          handleSendEditedMessage={handleSendEditedMessage}
+        />
       )}
 
       {/* Dialog popup för att svara på meddelande. */}

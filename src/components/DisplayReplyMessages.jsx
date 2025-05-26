@@ -1,17 +1,4 @@
-import {
-  Box,
-  Chip,
-  Menu,
-  MenuItem,
-  Tooltip,
-  Dialog,
-  useTheme,
-  useMediaQuery,
-  FormControl,
-  TextField,
-  Button,
-  Popover,
-} from "@mui/material";
+import { Box, Chip, Menu, MenuItem, Tooltip } from "@mui/material";
 import FaceIcon from "@mui/icons-material/Face";
 import { useState, useEffect } from "react";
 import { db } from "../firebase";
@@ -20,10 +7,9 @@ import {
   multiLineChipStyleWithMarginTop,
   multiLineChipStyle,
 } from "../utility/multiLinesChipStyle";
-import EmojiPicker from "emoji-picker-react";
-import colors from "../utility/colors";
 import DisplayEditedNotice from "./DisplayEditedNotice";
 import MenuItemContents from "./MenuItemContents";
+import TextEditDialog from "./TextEditDialog";
 
 const DisplayReplyMessages = ({
   replyBoolean,
@@ -36,9 +22,6 @@ const DisplayReplyMessages = ({
   const [newDate, setNewDate] = useState("");
   const [newMessage, setNewMessage] = useState(repliesMessages.text);
   const [toOpenTextEditForm, setToOpenTextEditForm] = useState(false);
-  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
-  const theme = useTheme();
-  const isTablet = useMediaQuery(theme.breakpoints.up("sm"));
 
   const handleOnClickOpenMenu = (e) => {
     setAnchorEl(e.currentTarget);
@@ -96,10 +79,6 @@ const DisplayReplyMessages = ({
     } catch (error) {
       console.log("Error updating message: ", error);
     }
-  };
-
-  const handleEmojiPicker = () => {
-    setShowEmojiPicker(!showEmojiPicker);
   };
 
   useEffect(() => {
@@ -180,50 +159,14 @@ const DisplayReplyMessages = ({
 
       {/* Dialog popup för att redigera på meddelande. */}
       {toOpenTextEditForm && (
-        <Dialog
-          open={toOpenTextEditForm}
-          onClose={() => setToOpenTextEditForm(false)}
-        >
-          <Box margin={6} width={isTablet ? "500px" : "300px"}>
-            <FormControl
-              component={"form"}
-              onSubmit={handleSendEditedMessage}
-              sx={{ width: isTablet ? "500px" : "300px" }}
-            >
-              <TextField
-                type={"text"}
-                value={newMessage}
-                onChange={handleNewMessageOnchange}
-                placeholder={"Type a message ..."}
-                size="small"
-                fullWidth
-              />
-              <Button onClick={handleEmojiPicker}>😊</Button>
-              <Button
-                sx={{ marginTop: "5px", bgcolor: colors.bgViolet }}
-                onClick={handleSendEditedMessage}
-                variant={"contained"}
-              >
-                Send
-              </Button>
-
-              {showEmojiPicker && (
-                <Popover
-                  open={showEmojiPicker}
-                  onClose={() => setShowEmojiPicker(false)}
-                >
-                  <EmojiPicker
-                    onEmojiClick={(emoji) =>
-                      setNewMessage(newMessage + emoji.emoji)
-                    }
-                    height={500}
-                    width={300}
-                  />
-                </Popover>
-              )}
-            </FormControl>
-          </Box>
-        </Dialog>
+        <TextEditDialog
+          toOpenTextEditForm={toOpenTextEditForm}
+          setToOpenTextEditForm={setToOpenTextEditForm}
+          newMessage={newMessage}
+          setNewMessage={setNewMessage}
+          handleNewMessageOnchange={handleNewMessageOnchange}
+          handleSendEditedMessage={handleSendEditedMessage}
+        />
       )}
     </Box>
   );
